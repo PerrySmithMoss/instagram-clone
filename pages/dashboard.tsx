@@ -6,7 +6,7 @@ import { Navbar } from "../components/Navbar/Navbar";
 
 const Home: NextPage = () => {
   return (
-    <div className="bg-gray-50 ">
+    <div>
       <Head>
         <title>Instagram</title>
         <meta name="description" content="Instagram" />

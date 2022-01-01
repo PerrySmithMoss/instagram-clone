@@ -13,7 +13,7 @@ interface INavbarProps {}
 
 export const Navbar: React.FC<INavbarProps> = ({}) => {
   return (
-    <div className="shadow-md bg-white border-b sticky top-0 z-50">
+    <div className="shadow-sm bg-white border-b sticky top-0 z-50">
       <div className="flex justify-between items-center content-center max-w-6xl mx-6 pt-3 pb-3 xl:mx-auto">
         {/* Logo */}
         {/* <div className="relative w-32 h-10 cursor-pointer"> */}
@@ -44,9 +44,9 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                   viewBox="0 0 20 20"
                 >
                   <path
-                    fill-rule="evenodd"
+                    fillRule="evenodd"
                     d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                    clip-rule="evenodd"
+                    clipRule="evenodd"
                   />
                 </svg>
               </div>
@@ -130,9 +130,9 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
               width="22"
             >
               <path
-                clip-rule="evenodd"
+                clipRule="evenodd"
                 d="M24 0C10.8 0 0 10.8 0 24s10.8 24 24 24 24-10.8 24-24S37.2 0 24 0zm0 45C12.4 45 3 35.6 3 24S12.4 3 24 3s21 9.4 21 21-9.4 21-21 21zm10.2-33.2l-14.8 7c-.3.1-.6.4-.7.7l-7 14.8c-.3.6-.2 1.3.3 1.7.3.3.7.4 1.1.4.2 0 .4 0 .6-.1l14.8-7c.3-.1.6-.4.7-.7l7-14.8c.3-.6.2-1.3-.3-1.7-.4-.5-1.1-.6-1.7-.3zm-7.4 15l-5.5-5.5 10.5-5-5 10.5z"
-                fill-rule="evenodd"
+                fillRule="evenodd"
               ></path>
             </svg>
           </div>
