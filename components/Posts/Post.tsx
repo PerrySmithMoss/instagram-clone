@@ -1,5 +1,5 @@
 import { faEllipsisH } from "@fortawesome/free-solid-svg-icons";
-import { faComment } from "@fortawesome/free-regular-svg-icons";
+import { faSmile } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 
@@ -18,11 +18,36 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
         />
         <p className="flex-1 font-medium">{post.username}</p>
         <div className="mr-2">
-          <FontAwesomeIcon
-            size="lg"
-            icon={faEllipsisH}
-            className="pl-1"
-          ></FontAwesomeIcon>
+          <svg
+            aria-label="More options"
+            className="_8-yf5 "
+            fill="#262626"
+            height="16"
+            viewBox="0 0 48 48"
+            width="16"
+          >
+            <circle
+              clip-rule="evenodd"
+              cx="8"
+              cy="24"
+              fill-rule="evenodd"
+              r="4.5"
+            ></circle>
+            <circle
+              clip-rule="evenodd"
+              cx="24"
+              cy="24"
+              fill-rule="evenodd"
+              r="4.5"
+            ></circle>
+            <circle
+              clip-rule="evenodd"
+              cx="40"
+              cy="24"
+              fill-rule="evenodd"
+              r="4.5"
+            ></circle>
+          </svg>
         </div>
       </div>
       {/* Post Image */}
@@ -95,16 +120,29 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
             <b>apple </b>
             new Iphone release ✨
           </div>
-          <div><span className="text-sm text-gray-500">View all 28 comments</span></div>
+          <div>
+            <span className="text-sm text-gray-500">View all 28 comments</span>
+          </div>
           <div className="post-date">
-            <span className="text-xs text-gray-500 uppercase">12 hours ago</span>
+            <span className="text-xs text-gray-500 uppercase">
+              12 hours ago
+            </span>
           </div>
         </div>
         <div className="bottom border-t pt-1 mt-3 px-4 pb-2">
-          <div className="wrapper flex">
+          <div className="flex items-center ">
+            <div className="cursor-pointer">
+              <svg
+                viewBox="0 0 20 20"
+                className="w-6 h-6 text-gray-500 opacity-80"
+              >
+                <path d="M10 20a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM6.5 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm7 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm2.16 3a6 6 0 0 1-11.32 0h11.32z" />
+              </svg>
+            </div>
+            {/* </button> */}
             <input
               type="text"
-              className="text-sm h-10 w-full outline-none focus:outline-none w-10/12"
+              className="text-sm h-10 ml-4 w-full outline-none focus:outline-none w-10/12"
               placeholder="Add a comment..."
             />
             <button className="text-blue-500 opacity-75 w-2/12 text-right font-bold">

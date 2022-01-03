@@ -1,0 +1,20 @@
+/* Mobile/Tablet Modal */
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 55;
+}
+
+.modalContent {
+  min-width: 70%;
+  /* min-height: 200px; */
+  background-color: white;
+  /* padding: 25px; */
+}
