@@ -1,14 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome } from "@fortawesome/free-solid-svg-icons";
-import {
-  faPaperPlane,
-  faPlusSquare,
-  faCompass,
-  faHeart,
-} from "@fortawesome/free-regular-svg-icons";
 import { CreatePostModal } from "./CreatePostModal";
 
 interface INavbarProps {}
@@ -18,7 +10,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
   return (
     <>
       <div className="shadow-sm bg-white border-b sticky top-0 z-50">
-        <div className="flex justify-between items-center content-center max-w-6xl mx-6 pt-3 pb-3 xl:mx-auto">
+        <div className="flex justify-between items-center content-center max-w-6xl mx-6 pt-3 pb-3 lg:mx-auto lg:px-10">
           {/* Logo */}
           {/* <div className="relative w-32 h-10 cursor-pointer"> */}
           <Link href="/">
@@ -68,36 +60,6 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
           </div>
           {/* Icons */}
           <div className="flex items-center justify-end space-x-5">
-            {/* <FontAwesomeIcon
-          color="black"
-          size="2x"
-          icon={faHome}
-          className="pl-1"
-        ></FontAwesomeIcon>
-        <FontAwesomeIcon
-          color="black"
-          size="2x"
-          icon={faPaperPlane}
-          className="pl-1"
-        ></FontAwesomeIcon>
-        <FontAwesomeIcon
-          color="black"
-          size="2x"
-          icon={faPlusSquare}
-          className="pl-1"
-        ></FontAwesomeIcon>
-        <FontAwesomeIcon
-          color="black"
-          size="2x"
-          icon={faCompass}
-          className="pl-1"
-        ></FontAwesomeIcon>
-        <FontAwesomeIcon
-          color="black"
-          size="2x"
-          icon={faHeart}
-          className="pl-1"
-        ></FontAwesomeIcon> */}
             <Link href="/">
               <div className=" cursor-pointer">
                 <svg
@@ -105,10 +67,10 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                   className="_8-yf5 "
                   fill="#262626"
                   height="22"
-                  viewBox="0 0 48 48"
+                  viewBox="0 0 24 24"
                   width="22"
                 >
-                  <path d="M45.5 48H30.1c-.8 0-1.5-.7-1.5-1.5V34.2c0-2.6-2.1-4.6-4.6-4.6s-4.6 2.1-4.6 4.6v12.3c0 .8-.7 1.5-1.5 1.5H2.5c-.8 0-1.5-.7-1.5-1.5V23c0-.4.2-.8.4-1.1L22.9.4c.6-.6 1.6-.6 2.1 0l21.5 21.5c.3.3.4.7.4 1.1v23.5c.1.8-.6 1.5-1.4 1.5z"></path>
+                  <path d="M22 23h-6.001a1 1 0 01-1-1v-5.455a2.997 2.997 0 10-5.993 0V22a1 1 0 01-1 1H2a1 1 0 01-1-1V11.543a1.002 1.002 0 01.31-.724l10-9.543a1.001 1.001 0 011.38 0l10 9.543a1.002 1.002 0 01.31.724V22a1 1 0 01-1 1z"></path>
                 </svg>
               </div>
             </Link>
@@ -116,13 +78,30 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
               <span className="relative ">
                 <svg
                   aria-label="Direct"
-                  className="_8-yf5 "
                   fill="#262626"
-                  height="22"
-                  viewBox="0 0 48 48"
-                  width="22"
+                  height="24"
+                  color="#262626"
+                  viewBox="0 0 24 24"
+                  width="24"
                 >
-                  <path d="M47.8 3.8c-.3-.5-.8-.8-1.3-.8h-45C.9 3.1.3 3.5.1 4S0 5.2.4 5.7l15.9 15.6 5.5 22.6c.1.6.6 1 1.2 1.1h.2c.5 0 1-.3 1.3-.7l23.2-39c.4-.4.4-1 .1-1.5zM5.2 6.1h35.5L18 18.7 5.2 6.1zm18.7 33.6l-4.4-18.4L42.4 8.6 23.9 39.7z"></path>
+                  <line
+                    fill="none"
+                    strokeLinecap="round"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinejoin="round"
+                    x1={22}
+                    x2={9.218}
+                    y1={3}
+                    y2={10.083}
+                  ></line>
+                  <polygon
+                    fill="none"
+                    points="11.698 20.334 22 3.001 2 3.001 9.218 10.084 11.698 20.334"
+                    stroke="currentColor"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                  ></polygon>
                 </svg>
                 <span className="absolute -top-0 left-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
                   1
@@ -135,42 +114,87 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
             >
               <svg
                 aria-label="Create Post"
-                className="h-8"
+                className=" h-6 w-6"
                 fill="#262626"
-                viewBox="0 0 20 20"
+                color="#262626"
+                viewBox="0 0 24 24"
               >
                 <path
-                  d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                  clip-rule="evenodd"
+                  fill="none"
+                  d="M2 12v3.45c0 2.849.698 4.005 1.606 4.944.94.909 2.098 1.608 4.946 1.608h6.896c2.848 0 4.006-.7 4.946-1.608C21.302 19.455 22 18.3 22 15.45V8.552c0-2.849-.698-4.006-1.606-4.945C19.454 2.7 18.296 2 15.448 2H8.552c-2.848 0-4.006.699-4.946 1.607C2.698 4.547 2 5.703 2 8.552z"
+                  strokeLinecap="round"
+                  stroke="currentColor"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
                 />
+                <line
+                  fill="none"
+                  strokeLinecap="round"
+                  stroke="currentColor"
+                  strokeLinejoin="round"
+                  x1={6.545}
+                  strokeWidth={2}
+                  x2={17.455}
+                  y1={12.001}
+                  y2={12.001}
+                ></line>
+                <line
+                  strokeLinecap="round"
+                  stroke="currentColor"
+                  strokeLinejoin="round"
+                  fill="none"
+                  x1={12.003}
+                  x2={12.003}
+                  y1={6.545}
+                  strokeWidth={2}
+                  y2={17.455}
+                ></line>
               </svg>
             </div>
             <div className=" cursor-pointer">
               <svg
                 aria-label="Find People"
-                className="_8-yf5 "
                 fill="#262626"
-                height="22"
-                viewBox="0 0 48 48"
-                width="22"
+                color="#262626"
+                height="24"
+                viewBox="0 0 24 24"
+                width="24"
               >
-                <path
-                  clipRule="evenodd"
-                  d="M24 0C10.8 0 0 10.8 0 24s10.8 24 24 24 24-10.8 24-24S37.2 0 24 0zm0 45C12.4 45 3 35.6 3 24S12.4 3 24 3s21 9.4 21 21-9.4 21-21 21zm10.2-33.2l-14.8 7c-.3.1-.6.4-.7.7l-7 14.8c-.3.6-.2 1.3.3 1.7.3.3.7.4 1.1.4.2 0 .4 0 .6-.1l14.8-7c.3-.1.6-.4.7-.7l7-14.8c.3-.6.2-1.3-.3-1.7-.4-.5-1.1-.6-1.7-.3zm-7.4 15l-5.5-5.5 10.5-5-5 10.5z"
+                <polygon
+                  fill="none"
+                  points="13.941 13.953 7.581 16.424 10.06 10.056 16.42 7.585 13.941 13.953"
+                  stroke="currentColor"
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                  strokeWidth={2}
+                ></polygon>
+                <polygon
                   fillRule="evenodd"
-                ></path>
+                  points="10.06 10.056 13.949 13.945 7.581 16.424 10.06 10.056"
+                  stroke="currentColor"
+                  strokeLinejoin="round"
+                ></polygon>
+                <circle
+                  cx={12.001}
+                  cy={12.005}
+                  fill="none"
+                  strokeWidth={2}
+                  r={10.5}
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                ></circle>
               </svg>
             </div>
             <div className=" cursor-pointer">
               <svg
-                aria-label="Activity Feed"
-                className="_8-yf5 "
+                aria-label="Notifications"
                 fill="#262626"
-                height="22"
-                viewBox="0 0 48 48"
-                width="22"
+                height="24"
+                viewBox="0 0 24 24"
+                width="24"
               >
-                <path d="M34.6 6.1c5.7 0 10.4 5.2 10.4 11.5 0 6.8-5.9 11-11.5 16S25 41.3 24 41.9c-1.1-.7-4.7-4-9.5-8.3-5.7-5-11.5-9.2-11.5-16C3 11.3 7.7 6.1 13.4 6.1c4.2 0 6.5 2 8.1 4.3 1.9 2.6 2.2 3.9 2.5 3.9.3 0 .6-1.3 2.5-3.9 1.6-2.3 3.9-4.3 8.1-4.3m0-3c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5.6 0 1.1-.2 1.6-.5 1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z"></path>
+                <path d="M16.792 3.904A4.989 4.989 0 0121.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 014.708-5.218 4.21 4.21 0 013.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 013.679-1.938m0-2a6.04 6.04 0 00-4.797 2.127 6.052 6.052 0 00-4.787-2.127A6.985 6.985 0 00.5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 003.518 3.018 2 2 0 002.174 0 45.263 45.263 0 003.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 00-6.708-7.218z"></path>
               </svg>
             </div>
             <div className=" cursor-pointer">

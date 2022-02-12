@@ -13,8 +13,23 @@
 }
 
 .modalContent {
-  min-width: 70%;
+width: 70%;
+  max-height: 575px;
   /* min-height: 200px; */
   background-color: white;
   /* padding: 25px; */
+}
+.createPostModalContentInner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 520px;
+}
+
+.createPostModalSwitch:checked {
+  right: 0;
+  border-color: #68D391;
+}
+.createPostModalSwitch:checked ~ label {
+  background-color: #68D391;
 }
