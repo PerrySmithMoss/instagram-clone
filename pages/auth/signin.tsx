@@ -14,7 +14,7 @@ const SignIn: NextPage = ({ providers }: any) => {
       <Navbar />
       {Object.values(providers).map((provider: any) => (
         <div key={provider.name}>
-          <button onClick={() => signIn(provider.id)}>
+          <button onClick={() => signIn(provider.id, {callbackUrl: "/dashboard"})}>
             Sign in with {provider.name}
           </button>
         </div>

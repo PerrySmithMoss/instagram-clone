@@ -10,11 +10,10 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { data: session } = useSession();
-
   return (
     <>
       <div className="shadow-sm bg-white border-b sticky top-0 z-50">
-        <div className="flex justify-between items-center content-center max-w-6xl mx-6 pt-3 pb-3 lg:mx-auto lg:px-10">
+        <div className="flex justify-between items-center content-center max-w-[975px] pt-3 pb-3 lg:mx-auto mx-auto px-4">
           {/* Logo */}
           {/* <div className="relative w-32 h-10 cursor-pointer"> */}
           <Link href="/">
@@ -42,7 +41,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
-                    className="h-4 w-4 text-gray-400"
+                    className="h-5 w-5 text-gray-400"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -55,7 +54,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                 </div>
                 <input
                   id="search"
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg leading-5 bg-gray-50 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:border-blue-300 focus:shadow-outline-blue sm:text-sm transition duration-150 ease-in-out"
+                  className="block w-full pl-10 pr-3 text-md py-[9px]   rounded-lg leading-5 bg-gray-100 placeholder:font-light placeholder-gray-500 focus:outline-none focus:placeholder-gray-400  transition duration-150 ease-in-out"
                   placeholder="Search"
                   type="search"
                 />
@@ -71,9 +70,9 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                     aria-label="Home"
                     className="_8-yf5 "
                     fill="#262626"
-                    height="22"
+                    height="24"
                     viewBox="0 0 24 24"
-                    width="22"
+                    width="24"
                   >
                     <path d="M22 23h-6.001a1 1 0 01-1-1v-5.455a2.997 2.997 0 10-5.993 0V22a1 1 0 01-1 1H2a1 1 0 01-1-1V11.543a1.002 1.002 0 01.31-.724l10-9.543a1.001 1.001 0 011.38 0l10 9.543a1.002 1.002 0 01.31.724V22a1 1 0 01-1 1z"></path>
                   </svg>
@@ -82,7 +81,8 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
               <div className="md:hidden cursor-pointer">
                 <span className="relative">
                   <svg
-                    className="w-6 h-6"
+                    height="24"
+                    width="24"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -102,10 +102,10 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                   <svg
                     aria-label="Direct"
                     fill="#262626"
-                    height="24"
+                    height="25"
                     color="#262626"
                     viewBox="0 0 24 24"
-                    width="24"
+                    width="25"
                   >
                     <line
                       fill="none"
@@ -126,7 +126,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                       strokeWidth={2}
                     ></polygon>
                   </svg>
-                  <span className="absolute -top-0 left-0 inline-flex items-center justify-center px-2 py-1 text-xs leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+                  <span className="absolute -top-0 left-2 inline-flex items-center justify-center px-1.5 py-1 text-xs leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
                     1
                   </span>
                 </span>
@@ -137,7 +137,8 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
               >
                 <svg
                   aria-label="Create Post"
-                  className=" h-6 w-6"
+                  height="25"
+                  width="25"
                   fill="#262626"
                   color="#262626"
                   viewBox="0 0 24 24"
@@ -234,17 +235,17 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
 
                 {isProfileOpen ? (
                   <div className="absolute top-9 -right-3 pt-2">
-                    <div className="relative py-1 bg-white border border-gray-200 rounded-md shadow-xl w-52">
+                    <div className="relative bg-white border border-gray-200 rounded-md shadow-xl w-52">
                       <div className="absolute top-0 right-12 w-4 h-4 origin-center transform rotate-45 translate-x-5 -translate-y-2 bg-white border-t border-l border-gray-200 rounded-sm pointer-events-none"></div>
                       <div className="relative">
-                        <div className="flex content-center items-center w-full px-3.5 py-2 space-x-3">
+                        <div className="flex content-center items-center w-full px-4 py-2 space-x-3 hover:bg-gray-50">
                           <svg
                             aria-label="Profile"
                             fill="#262626"
                             color="#262626"
-                            height="16"
+                            height="17"
                             viewBox="0 0 24 24"
-                            width="16"
+                            width="17"
                           >
                             <circle
                               cx={12.004}
@@ -277,19 +278,19 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                           </svg>
                           <a
                             href="#"
-                            className="block  text-sm text-gray-700 whitespace-no-wrap hover:bg-gray-100 focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out"
+                            className="block  text-sm text-gray-700 whitespace-no-wrap focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out"
                           >
                             Profile
                           </a>
                         </div>
-                        <div className="flex content-center items-center w-full px-3.5 py-2 space-x-3">
+                        <div className="flex content-center items-center w-full px-4 py-2 space-x-3 hover:bg-gray-50">
                           <svg
                             aria-label="Profile"
                             fill="#262626"
                             color="#262626"
-                            height="16"
+                            height="17"
                             viewBox="0 0 24 24"
-                            width="16"
+                            width="17"
                           >
                             <polygon
                               fill="none"
@@ -303,19 +304,19 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                           </svg>
                           <a
                             href="#"
-                            className="block  text-sm text-gray-700 whitespace-no-wrap hover:bg-gray-100 focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out"
+                            className="block  text-sm text-gray-700 whitespace-no-wrap focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out"
                           >
                             Saved
                           </a>
                         </div>
-                        <div className="flex content-center items-center w-full px-3.5 py-2 space-x-3">
+                        <div className="flex content-center items-center w-full px-4 py-2 space-x-3 hover:bg-gray-50">
                           <svg
                             aria-label="Profile"
                             fill="#262626"
                             color="#262626"
-                            height="16"
+                            height="17"
                             viewBox="0 0 24 24"
-                            width="16"
+                            width="17"
                           >
                             <circle
                               cx={12}
@@ -338,25 +339,25 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                           </svg>
                           <a
                             href="#"
-                            className="block  text-sm text-gray-700 whitespace-no-wrap hover:bg-gray-100 focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out"
+                            className="block  text-sm text-gray-700 whitespace-no-wrap focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out"
                           >
                             Settings
                           </a>
                         </div>
-                        <div className="flex content-center items-center w-full px-3.5 py-2 space-x-3">
+                        <div className="flex content-center items-center w-full px-4 py-2 space-x-3 hover:bg-gray-50">
                           <svg
                             aria-label="Profile"
                             fill="#262626"
                             color="#262626"
-                            height="16"
+                            height="17"
                             viewBox="0 0 24 24"
-                            width="16"
+                            width="17"
                           >
                             <path d="M8 8.363a1 1 0 00-1-1H4.31a8.977 8.977 0 0114.054-1.727 1 1 0 101.414-1.414A11.003 11.003 0 003 5.672V3.363a1 1 0 10-2 0v5a1 1 0 001 1h5a1 1 0 001-1zm14 6.274h-5a1 1 0 000 2h2.69a8.977 8.977 0 01-14.054 1.727 1 1 0 00-1.414 1.414A11.004 11.004 0 0021 18.33v2.307a1 1 0 002 0v-5a1 1 0 00-1-1z" />
                           </svg>
                           <a
                             href="#"
-                            className="block  text-sm text-gray-700 whitespace-no-wrap hover:bg-gray-100 focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out"
+                            className="block  text-sm text-gray-700 whitespace-no-wrap focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out"
                           >
                             Switch Accounts
                           </a>
@@ -364,7 +365,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                         <hr />
                         <button
                           onClick={() => signOut()}
-                          className="block w-full px-4 py-2 text-sm 3ext-gray-700 whitespace-no-wrap hover:bg-gray-100 focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out"
+                          className="block text-left hover:bg-gray-50 w-full px-4 py-2 text-sm text-gray-700 whitespace-no-wrap focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out"
                         >
                           Log out
                         </button>
@@ -375,7 +376,9 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
               </div>
             </div>
           ) : (
-            <button className="text-blue-400" onClick={() => signIn()}>Login</button>
+            <button className="text-blue-400" onClick={() => signIn()}>
+              Login
+            </button>
           )}
         </div>
       </div>

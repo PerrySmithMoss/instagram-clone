@@ -14,10 +14,6 @@ const Home: NextPage = () => {
       </Head>
       <Navbar />
       <Feed />
-      {/* Feed */}
-
-
-      {/* Sidebar */}
     </div>
   );
 };

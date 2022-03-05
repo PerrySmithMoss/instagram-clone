@@ -8,7 +8,7 @@ interface IFeedProps {}
 
 export const Feed: React.FC<IFeedProps> = ({}) => {
   return (
-    <main className="grid grid-cols-1 md:grid-cols-2 md:max-w-3xl lg:grid-cols-3 mx-auto">
+    <main className="grid grid-cols-1 md:grid-cols-2 md:max-w-[975px] lg:grid-cols-3 mx-auto px-4">
       {/* Section left */}
       <section className="col-span-2">
         <Stories />
