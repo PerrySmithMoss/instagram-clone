@@ -1,6 +1,7 @@
 import { useSession, signOut, signIn } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { CreatePostModal } from "./CreatePostModal";
 
@@ -10,6 +11,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { data: session } = useSession();
+  const router = useRouter()
   return (
     <>
       <div className="shadow-sm bg-white border-b sticky top-0 z-50">

@@ -1,23 +1,64 @@
 .authLoginImageWrapper {
-  background-image: url("/assets/image/Login/login-image.png");
+  background-image: url("/assets/image/Login/login-phones.png");
   align-self: center;
-  background-position: 0 0;
-  background-size: 450px 620px;
-  flex-basis: 450px;
-  height: 620px;
-  margin-left: -35px;
-  margin-right: -15px;
+  background-position: -46px 0;
+  background-size: 469px 635px;
+  flex-basis: 380px;
+  height: 582px;
+  /* margin-left: -35px; */
+  margin-bottom: 12px;
+  margin-right: 32px;
 }
 .authLoginImageContainer {
-  margin: 100px 0 0 151px;
+  margin: 27px 0 0 113px;
   position: relative;
 }
 .authLoginImage {
-  height: 430px;
+  height: 538px;
   left: 0;
   position: absolute;
   top: 0;
-  width: 236px;
+  width: 250px;
+  animation-name: multiple-image-crossfade;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-duration: 20s;
+}
+
+.authLoginImageContainer img:nth-of-type(1) {
+  animation-delay: 15s;
+}
+.authLoginImageContainer img:nth-of-type(2) {
+  animation-delay: 10s;
+}
+.authLoginImageContainer img:nth-of-type(3) {
+  animation-delay: 5s;
+}
+.authLoginImageContainer img:nth-of-type(4) {
+  animation-delay: 0;
+}
+
+@keyframes multiple-image-crossfade {
+  0% {
+    opacity: 1;
+  }
+  17% {
+    opacity: 1;
+  }
+  25% {
+    opacity: 0;
+  }
+  92% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.formBorder {
+  border: 1px solid rgba(var(--b6a,219,219,219),1);
+  background-color: rgba(var(--d87,255,255,255),1);
 }
 
 .authInput {
@@ -35,4 +76,19 @@
   transition: all 0.2s ease-out;
   top: -0.1rem;
   color: #667eea;
+}
+
+.orSeperator::before,
+.orSeperator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid rgba(var(--b38,219,219,219),1);
+}
+
+.orSeperator:not(:empty)::before {
+  margin-right: .25em;
+}
+
+.orSeperator:not(:empty)::after {
+  margin-left: .25em;
 }

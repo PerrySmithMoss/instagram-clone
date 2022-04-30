@@ -14,7 +14,7 @@ export const Suggestions: React.FC<ISuggestionsProps> = ({}) => {
   }, []);
 
   return (
-    <div className="mt-5 ml-10">
+    <div className="mt-5 ml-10 w-full">
       <div className="flex justify-between text-sm mb-5">
         <h3 className="text-sm font-medium text-gray-400">
           Suggestions for you
