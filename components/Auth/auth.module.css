@@ -1,6 +1,14 @@
 .authLoginImageWrapper {
   background-image: url("/assets/image/Login/login-phones.png");
   align-self: center;
+  align-items: stretch;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+  position: relative;
   background-position: -46px 0;
   background-size: 469px 635px;
   flex-basis: 380px;
@@ -57,8 +65,8 @@
 }
 
 .formBorder {
-  border: 1px solid rgba(var(--b6a,219,219,219),1);
-  background-color: rgba(var(--d87,255,255,255),1);
+  border: 1px solid rgba(var(--b6a, 219, 219, 219), 1);
+  background-color: rgba(var(--d87, 255, 255, 255), 1);
 }
 
 .authInput {
@@ -80,15 +88,21 @@
 
 .orSeperator::before,
 .orSeperator::after {
-  content: '';
+  content: "";
   flex: 1;
-  border-bottom: 1px solid rgba(var(--b38,219,219,219),1);
+  border-bottom: 1px solid rgba(var(--b38, 219, 219, 219), 1);
 }
 
 .orSeperator:not(:empty)::before {
-  margin-right: .25em;
+  margin-right: 0.25em;
 }
 
 .orSeperator:not(:empty)::after {
-  margin-left: .25em;
+  margin-left: 0.25em;
+}
+
+@media only screen and (max-width: 875px) {
+  .authLoginImageWrapper {
+    display: none;
+  }
 }
