@@ -1,6 +1,8 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import AuthStyles from "./auth.module.css";
+import { signIn } from "next-auth/react"
+
 interface ILoginProps {
   providers: any;
 }
@@ -100,7 +102,7 @@ export const Login: React.FC<ILoginProps> = ({ providers }) => {
                     </div>
                     <div className="flex justify-center items-center space-x-2 pt-4">
                       <div>
-                        <a className="flex cursor-pointer items-center space-x-2">
+                        <a onClick={() => signIn("facebook")} className="flex cursor-pointer items-center space-x-2">
                           <svg
                             version="1.1"
                             id="Layer_1"
@@ -143,7 +145,7 @@ export const Login: React.FC<ILoginProps> = ({ providers }) => {
                             Log in with Facebook
                           </span>
                         </a>
-                        <a className="flex cursor-pointer items-center space-x-2 mt-3">
+                        <a onClick={() => signIn("google")} className="flex cursor-pointer items-center space-x-2 mt-3">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             height={19}
