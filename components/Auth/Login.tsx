@@ -100,7 +100,7 @@ export const Login: React.FC<ILoginProps> = ({ providers }) => {
                     </div>
                     <div className="flex justify-center items-center space-x-2 pt-4">
                       <div>
-                        <div className="flex items-center space-x-2">
+                        <a className="flex cursor-pointer items-center space-x-2">
                           <svg
                             version="1.1"
                             id="Layer_1"
@@ -142,8 +142,8 @@ export const Login: React.FC<ILoginProps> = ({ providers }) => {
                           <span className="text-blue-900 font-medium">
                             Log in with Facebook
                           </span>
-                        </div>
-                        <div className="flex items-center space-x-2 mt-3">
+                        </a>
+                        <a className="flex cursor-pointer items-center space-x-2 mt-3">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             height={19}
@@ -171,14 +171,14 @@ export const Login: React.FC<ILoginProps> = ({ providers }) => {
                           <span className="text-blue-900 font-medium">
                             Log in with Google
                           </span>
-                        </div>
+                        </a>
                       </div>
                     </div>
-                    <div className="flex justify-center pt-4 pb-5">
-                      <span className="text-blue-900 text-[13px]">
+                    <a className="flex justify-center pt-4 pb-5">
+                      <span className="cursor-pointer text-blue-900 text-[13px]">
                         Forgot password?
                       </span>
-                    </div>
+                    </a>
                   </form>
                 </div>
               </div>
