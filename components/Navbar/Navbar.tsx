@@ -1,8 +1,9 @@
-import { useSession, signOut, signIn } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
+import { useAuth } from "../../context/AuthContext";
+import { useOnClickOutside } from "../../hooks/useOnClickOustide";
 import { CreatePostModal } from "./CreatePostModal";
 
 interface INavbarProps {}
@@ -10,14 +11,17 @@ interface INavbarProps {}
 export const Navbar: React.FC<INavbarProps> = ({}) => {
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const { data: session } = useSession();
-  const router = useRouter()
+  const { user, logOut, signIn } = useAuth();
+
+  const profileRef = useRef(null);
+  useOnClickOutside(profileRef, () => setIsProfileOpen(false));
+
+  const router = useRouter();
   return (
     <>
       <div className="shadow-sm bg-white border-b sticky top-0 z-50">
         <div className="flex justify-between items-center content-center max-w-[975px] pt-3 pb-3 lg:mx-auto mx-auto px-4">
           {/* Logo */}
-          {/* <div className="relative w-32 h-10 cursor-pointer"> */}
           <Link href="/">
             <img
               src="/assets/image/Navbar/logo3.png"
@@ -26,14 +30,6 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
               //  objectFit="contain"
             />
           </Link>
-          {/* </div> */}
-          {/* <div classNameName="relative w-10 h-10 lg:hidden flex-shrink-0">
-        <Image
-          src="/assets/image/logo-icon.webp"
-          layout="fill"
-          objectFit="contain"
-        />
-      </div> */}
           {/* Search */}
           <div className="hidden flex-1 md:flex items-center justify-center px-16 lg:ml-12">
             <div className="max-w-lg w-full lg:max-w-xs">
@@ -64,7 +60,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
             </div>
           </div>
           {/* Icons */}
-          {session ? (
+          {user ? (
             <div className="flex items-center content-center justify-end space-x-5">
               <Link href="/">
                 <div className=" cursor-pointer">
@@ -231,12 +227,19 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                   <img
                     className="rounded-full"
                     alt="Profile Picture"
-                    src={session?.user?.image as string}
+                    src={
+                      (user?.photoUrl as string)
+                        ? (user?.photoUrl as string)
+                        : "/assets/image/Navbar/default_profile_pic.jpeg"
+                    }
                   />
                 </div>
 
                 {isProfileOpen ? (
-                  <div className="absolute top-9 -right-3 pt-2">
+                  <div
+                    ref={profileRef}
+                    className="absolute top-9 -right-3 pt-2"
+                  >
                     <div className="relative bg-white border border-gray-200 rounded-md shadow-xl w-52">
                       <div className="absolute top-0 right-12 w-4 h-4 origin-center transform rotate-45 translate-x-5 -translate-y-2 bg-white border-t border-l border-gray-200 rounded-sm pointer-events-none"></div>
                       <div className="relative">
@@ -366,7 +369,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                         </div>
                         <hr />
                         <button
-                          onClick={() => signOut()}
+                          onClick={() => logOut()}
                           className="block text-left hover:bg-gray-50 w-full px-4 py-2 text-sm text-gray-700 whitespace-no-wrap focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out"
                         >
                           Log out
@@ -378,9 +381,14 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
               </div>
             </div>
           ) : (
-            <button className="text-blue-400" onClick={() => signIn()}>
-              Login
-            </button>
+            <div className="flex space-x-6">
+              <Link href="/login">
+                <button className="text-blue-400">Log in</button>
+              </Link>
+              <Link href="/sign-up">
+                <button className="text-blue-400">Sign up</button>
+              </Link>
+            </div>
           )}
         </div>
       </div>
