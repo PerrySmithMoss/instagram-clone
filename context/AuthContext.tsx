@@ -1,7 +1,10 @@
 import {
   createUserWithEmailAndPassword,
+  FacebookAuthProvider,
+  GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut,
 } from "firebase/auth";
 import {
@@ -64,6 +67,7 @@ export const AuthContextProvider = ({
         email: user.email,
         profilePicture: null,
         fullName: userDetails.fullName,
+        username: null,
       });
     } catch (error: any) {
       if (error.code === "auth/email-already-in-use") {
@@ -78,6 +82,44 @@ export const AuthContextProvider = ({
     }
   };
 
+  const signUpWithGoogle = async () => {
+    const googleAuthProvider = new GoogleAuthProvider();
+
+    const res = await signInWithPopup(auth, googleAuthProvider);
+
+    const user = res.user;
+
+    const usersCollectionRef = collection(db, "users");
+
+    await addDoc(usersCollectionRef, {
+      uid: user.uid,
+      displayName: user.displayName,
+      email: user.email,
+      profilePicture: user.photoURL,
+      fullName: user.displayName,
+      username: null,
+    });
+  };
+
+  const signUpWithFacebook = async () => {
+    const facebookAuthProvider = new FacebookAuthProvider();
+
+    const res = await signInWithPopup(auth, facebookAuthProvider);
+
+    const user = res.user;
+
+    const usersCollectionRef = collection(db, "users");
+
+    await addDoc(usersCollectionRef, {
+      uid: user.uid,
+      displayName: user.displayName,
+      email: user.email,
+      profilePicture: user.photoURL,
+      fullName: user.displayName,
+      username: null,
+    });
+  };
+
   const logIn = (email: string, password: string) => {
     return signInWithEmailAndPassword(auth, email, password);
   };
@@ -88,7 +130,9 @@ export const AuthContextProvider = ({
   };
 
   return (
-    <AuthContext.Provider value={{ user, signUp, logIn, logOut }}>
+    <AuthContext.Provider
+      value={{ user, signUp, logIn, logOut, signUpWithGoogle, signUpWithFacebook }}
+    >
       {loading ? null : children}
     </AuthContext.Provider>
   );

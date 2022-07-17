@@ -9,9 +9,7 @@ interface ISignUpProps {
 }
 
 export const SignUp: React.FC<ISignUpProps> = ({ providers }) => {
-  const { user, signUp } = useAuth();
-  const [emailInput, setEmailInput] = useState("");
-  const [passwordInput, setPasswordInput] = useState("");
+  const { user, signUp, signUpWithGoogle, signUpWithFacebook } = useAuth();
   const [userInputDetails, setUserInputDetails] = useState({
     email: "",
     fullName: "",
@@ -38,24 +36,35 @@ export const SignUp: React.FC<ISignUpProps> = ({ providers }) => {
     }
   };
 
+  const handleSignUpWithGoogle = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+
+    try {
+      await signUpWithGoogle();
+    } catch (err) {
+      console.log("Error while trying to login", err);
+    }
+  };
+
+  const handleSignUpWithFacebook = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+
+    try {
+      await signUpWithFacebook();
+    } catch (err) {
+      console.log("Error while trying to login", err);
+    }
+  };
+
   return (
     <div className=" items-stretch flex shrink-0 m-0 p-0 relative h-full">
       <section className=" min-h-screen overflow-hidden flex flex-col grow">
         <main className="bg-[#fafafa] grow order-4 flex">
           <article className="flex flex-row flex-grow justify-center items-center mt-[32px] mx-auto mb-0 max-w-[935px] w-full pb-[32px]">
-            <div className={AuthStyles.authLoginImageWrapper}>
-              <div className={AuthStyles.authLoginImageContainer}>
-                {images.map((image: string, index) => (
-                  <img
-                    key={index}
-                    className={AuthStyles.authLoginImage}
-                    src={image}
-                    alt="Instagram app on iPhone"
-                  />
-                ))}
-              </div>
-            </div>
-
             <div className="flex flex-col flex-grow justify-center items-center content-center mt-4 max-w-sm  pb-5">
               <div className={`${AuthStyles.formBorder} max-w-sm w-full pt-4`}>
                 <div className="flex justify-center mx-auto mt-6 mb-3">
@@ -78,9 +87,9 @@ export const SignUp: React.FC<ISignUpProps> = ({ providers }) => {
                   </h2>
                 </div>
                 <div className="py-3 mx-10">
-                  <a
-                    onClick={() => signIn("facebook")}
-                    className="flex cursor-pointer items-center rounded-sm space-x-2 bg-[#0095f6] w-full justify-center text-white py-1.5"
+                  <button
+                    onClick={(e) => handleSignUpWithFacebook(e)}
+                    className="flex cursor-pointer items-center shadow rounded-sm space-x-2 hover:shadow-md bg-[#0095f6] w-full justify-center text-white py-1.5"
                   >
                     <svg
                       version="1.1"
@@ -121,9 +130,43 @@ export const SignUp: React.FC<ISignUpProps> = ({ providers }) => {
                     </svg>
 
                     <span className="text-sm font-semibold">
-                      Log in with Facebook
+                      Sign up with Facebook
                     </span>
-                  </a>
+                  </button>
+                </div>
+                <div className="pb-3 mx-10">
+                  <button
+                    onClick={(e) => handleSignUpWithGoogle(e)}
+                    className="flex cursor-pointer items-center hover:shadow-md rounded-sm space-x-2 outline-none text-gray-600 w-full justify-center shadow py-1.5"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      height={19}
+                      width={19}
+                      viewBox="0 0 48 48"
+                    >
+                      <path
+                        fill="#FFC107"
+                        d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"
+                      />
+                      <path
+                        fill="#FF3D00"
+                        d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"
+                      />
+                      <path
+                        fill="#4CAF50"
+                        d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"
+                      />
+                      <path
+                        fill="#1976D2"
+                        d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"
+                      />
+                    </svg>
+
+                    <span className="text-sm font-semibold">
+                      Sign up with Google
+                    </span>
+                  </button>
                 </div>
                 <div
                   className={`${AuthStyles.orSeperator} flex justify-center text-center items-center mx-10 mb-5`}
@@ -219,6 +262,47 @@ export const SignUp: React.FC<ISignUpProps> = ({ providers }) => {
                       </button>
                     </div>
                   </form>
+                  <div className="flex justify-center mt-2 mb-5">
+                    <p className="text-[#8e8e8e] text-center text-xs mx-9">
+                      People who use our service may have uploaded your contact
+                      information to Instagram.
+                      <a
+                        className="font-semibold text-[#8e8e8e]"
+                        href="https://www.facebook.com/help/instagram/261704639352628"
+                      >
+                        {" "}
+                        Learn More
+                      </a>
+                      .
+                      <br />
+                      <br />
+                      By signing up, you agree to our
+                      <a
+                        className="font-semibold text-[#8e8e8e]"
+                        href="https://help.instagram.com/581066165581870"
+                      >
+                        {" "}
+                        Terms.
+                      </a>{" "}
+                      Learn how we collect, use and share your data in our
+                      <a
+                        className="font-semibold text-[#8e8e8e]"
+                        href="https://help.instagram.com/519522125107875"
+                      >
+                        {" "}
+                        Data Policy
+                      </a>
+                      and how we use cookies and similar technology in our
+                      <a
+                        className="font-semibold text-[#8e8e8e]"
+                        href="https://help.instagram.com/1896641480634370?ref=ig"
+                      >
+                        {" "}
+                        Cookie Policy
+                      </a>
+                      .
+                    </p>
+                  </div>
                 </div>
               </div>
               <div className={`${AuthStyles.formBorder} max-w-sm w-full mt-4`}>
