@@ -226,6 +226,7 @@ export const Login: React.FC<ILoginProps> = ({ providers }) => {
                   <div>
                     <a
                       target="_blank"
+                      rel="noopener noreferrer"
                       href="https://itunes.apple.com/app/instagram/id389801252?pt=428156&ct=igweb.loginPage.badge&mt=8&vt=lo"
                     >
                       <img
@@ -238,6 +239,7 @@ export const Login: React.FC<ILoginProps> = ({ providers }) => {
                   <div>
                     <a
                       target="_blank"
+                      rel="noopener noreferrer"
                       href="https://play.google.com/store/apps/details?id=com.instagram.android&referrer=utm_source%3Dinstagramweb%26utm_campaign%3DloginPage%26ig_mid%3D8146E8C7-CD43-4F34-AC25-D96B41D52CB1%26utm_content%3Dlo%26utm_medium%3Dbadge"
                     >
                       <img
