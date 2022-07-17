@@ -209,7 +209,7 @@ export const Login: React.FC<ILoginProps> = ({ providers }) => {
               <div className={`${AuthStyles.formBorder} max-w-sm w-full mt-4`}>
                 <div className="flex justify-center py-5">
                   <p className=" text-sm text-[#262626]">
-                    Don't have an account?{" "}
+                    Don&apos;t have an account?{" "}
                     <Link href="/sign-up">
                       <span className="cursor-pointer text-[#0095f6] hover:text-blue-500 font-semibold">
                         Sign up

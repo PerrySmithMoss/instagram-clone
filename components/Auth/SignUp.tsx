@@ -267,6 +267,8 @@ export const SignUp: React.FC<ISignUpProps> = ({ providers }) => {
                       People who use our service may have uploaded your contact
                       information to Instagram.
                       <a
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="font-semibold text-[#8e8e8e]"
                         href="https://www.facebook.com/help/instagram/261704639352628"
                       >
@@ -278,7 +280,9 @@ export const SignUp: React.FC<ISignUpProps> = ({ providers }) => {
                       <br />
                       By signing up, you agree to our
                       <a
-                        className="font-semibold text-[#8e8e8e]"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold text-[#423d3d]"
                         href="https://help.instagram.com/581066165581870"
                       >
                         {" "}
@@ -286,6 +290,8 @@ export const SignUp: React.FC<ISignUpProps> = ({ providers }) => {
                       </a>{" "}
                       Learn how we collect, use and share your data in our
                       <a
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="font-semibold text-[#8e8e8e]"
                         href="https://help.instagram.com/519522125107875"
                       >
@@ -294,6 +300,8 @@ export const SignUp: React.FC<ISignUpProps> = ({ providers }) => {
                       </a>
                       and how we use cookies and similar technology in our
                       <a
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="font-semibold text-[#8e8e8e]"
                         href="https://help.instagram.com/1896641480634370?ref=ig"
                       >
@@ -325,6 +333,7 @@ export const SignUp: React.FC<ISignUpProps> = ({ providers }) => {
                   <div>
                     <a
                       target="_blank"
+                      rel="noopener noreferrer"
                       href="https://itunes.apple.com/app/instagram/id389801252?pt=428156&ct=igweb.loginPage.badge&mt=8&vt=lo"
                     >
                       <img
@@ -337,6 +346,7 @@ export const SignUp: React.FC<ISignUpProps> = ({ providers }) => {
                   <div>
                     <a
                       target="_blank"
+                      rel="noopener noreferrer"
                       href="https://play.google.com/store/apps/details?id=com.instagram.android&referrer=utm_source%3Dinstagramweb%26utm_campaign%3DloginPage%26ig_mid%3D8146E8C7-CD43-4F34-AC25-D96B41D52CB1%26utm_content%3Dlo%26utm_medium%3Dbadge"
                     >
                       <img
