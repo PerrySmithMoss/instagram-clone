@@ -1,6 +1,4 @@
-import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import React, { useRef, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useOnClickOutside } from "../../hooks/useOnClickOustide";
@@ -16,7 +14,6 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
   const profileRef = useRef(null);
   useOnClickOutside(profileRef, () => setIsProfileOpen(false));
 
-  const router = useRouter();
   return (
     <>
       <div className="shadow-sm bg-white border-b sticky top-0 z-50">

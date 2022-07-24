@@ -1,16 +1,14 @@
 import type { NextPage } from "next";
-import { getProviders, useSession } from "next-auth/react";
 import Head from "next/head";
 import { Login } from "../components/Auth/Login";
 import { Feed } from "../components/Feed/Feed";
 import { Navbar } from "../components/Navbar/Navbar";
 import { useAuth } from "../context/AuthContext";
 
-const Home: NextPage = ({ providers }: any) => {
-  const { data: session } = useSession();
+const Home: NextPage = () => {
   const { user } = useAuth();
 
-  if (!user) return <Login providers={providers} />;
+  if (!user) return <Login />;
   return (
     <div className="bg-gray-50 ">
       <Head>
@@ -25,13 +23,3 @@ const Home: NextPage = ({ providers }: any) => {
 };
 
 export default Home;
-
-// export const getServerSideProps = async () => {
-//   const providers = await getProviders();
-
-//   return {
-//     props: {
-//       providers,
-//     },
-//   };
-// };

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import AuthStyles from "./auth.module.css";
-import { signIn } from "next-auth/react";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/router";
 import {
@@ -57,20 +56,6 @@ export const Login: React.FC<ILoginProps> = () => {
         `Error while trying to login with ${authProvider} provider: `,
         err
       );
-    }
-  };
-
-  const handleLogInWithFacebook = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    e.preventDefault();
-
-    try {
-      await logInWithEmailAndPassword(emailInput, passwordInput);
-
-      router.push("/");
-    } catch (err) {
-      console.log("Error while trying to login", err);
     }
   };
 

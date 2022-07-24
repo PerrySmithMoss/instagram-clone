@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import faker from "faker";
+
 interface ISuggestionsProps {}
 
 export const Suggestions: React.FC<ISuggestionsProps> = ({}) => {
