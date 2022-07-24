@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import faker from "faker";
 import { Story } from "./Story";
-import { useSession } from "next-auth/react";
+import { useAuth } from "../../context/AuthContext";
 
 interface IStoriesProps {}
 
 export const Stories: React.FC<IStoriesProps> = ({}) => {
   const [suggestions, setSuggestions] = useState<any>([]);
-  const { data: session } = useSession();
-  console.log(session)
+  const { user } = useAuth();
 
   useEffect(() => {
     const suggestions = [...Array(20)].map((_, i) => ({
@@ -20,12 +19,12 @@ export const Stories: React.FC<IStoriesProps> = ({}) => {
 
   return (
     <div className="flex space-x-2 p-4 bg-white border border-gray-200 mt-5 overflow-x-scroll">
-      {session && (
+      {user && (
         <Story
-          key={session.user.uid}
-          uid={session.user.uid as string}
-          image={session.user.image as string}
-          username={session.user.username as string}
+          key={user.uid}
+          uid={user.uid as string}
+          image={user.photoUrl as string}
+          username={user.username as string}
         />
       )}
       {suggestions.map((profile: any) => (

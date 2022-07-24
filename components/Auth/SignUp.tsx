@@ -1,8 +1,8 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import AuthStyles from "./auth.module.css";
-import { signIn } from "next-auth/react";
 import { useAuth } from "../../context/AuthContext";
+import { useRouter } from "next/router"
 
 interface ISignUpProps {
   providers: any;
@@ -16,6 +16,8 @@ export const SignUp: React.FC<ISignUpProps> = ({ providers }) => {
     username: "",
     password: "",
   });
+
+  const router = useRouter()
 
   const onFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUserInputDetails({
@@ -31,6 +33,8 @@ export const SignUp: React.FC<ISignUpProps> = ({ providers }) => {
 
     try {
       await signUp(userInputDetails);
+
+      router.push("/")
     } catch (err) {
       console.log("Error while trying to login", err);
     }
@@ -43,8 +47,10 @@ export const SignUp: React.FC<ISignUpProps> = ({ providers }) => {
 
     try {
       await signUpWithGoogle();
+
+      router.push("/")
     } catch (err) {
-      console.log("Error while trying to login", err);
+      console.log("Error while trying to sign up with Google", err);
     }
   };
 
@@ -55,8 +61,10 @@ export const SignUp: React.FC<ISignUpProps> = ({ providers }) => {
 
     try {
       await signUpWithFacebook();
+
+      router.push("/")
     } catch (err) {
-      console.log("Error while trying to login", err);
+      console.log("Error while trying to sign up with Facebook", err);
     }
   };
 

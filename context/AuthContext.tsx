@@ -120,7 +120,11 @@ export const AuthContextProvider = ({
     });
   };
 
-  const logIn = (email: string, password: string) => {
+  const logInWithEmailAndPassword = (email: string, password: string) => {
+    return signInWithEmailAndPassword(auth, email, password);
+  };
+
+  const logInWithGoogle = (email: string, password: string) => {
     return signInWithEmailAndPassword(auth, email, password);
   };
 
@@ -131,7 +135,7 @@ export const AuthContextProvider = ({
 
   return (
     <AuthContext.Provider
-      value={{ user, signUp, logIn, logOut, signUpWithGoogle, signUpWithFacebook }}
+      value={{ user, signUp, logInWithEmailAndPassword, logOut, signUpWithGoogle, signUpWithFacebook }}
     >
       {loading ? null : children}
     </AuthContext.Provider>

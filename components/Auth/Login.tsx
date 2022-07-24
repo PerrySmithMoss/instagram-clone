@@ -3,15 +3,21 @@ import React, { useState } from "react";
 import AuthStyles from "./auth.module.css";
 import { signIn } from "next-auth/react";
 import { useAuth } from "../../context/AuthContext";
+import { useRouter } from "next/router";
+import {
+  FacebookAuthProvider,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
+import { auth } from "../../firebase";
 
-interface ILoginProps {
-  providers: any;
-}
+interface ILoginProps {}
 
-export const Login: React.FC<ILoginProps> = ({ providers }) => {
+export const Login: React.FC<ILoginProps> = () => {
   const [emailInput, setEmailInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
-  const { user, logIn } = useAuth();
+  const { logInWithEmailAndPassword } = useAuth();
+  const router = useRouter();
 
   const handleLogIn = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -19,7 +25,50 @@ export const Login: React.FC<ILoginProps> = ({ providers }) => {
     e.preventDefault();
 
     try {
-      await logIn(emailInput, passwordInput);
+      await logInWithEmailAndPassword(emailInput, passwordInput);
+
+      router.push("/");
+    } catch (err) {
+      console.log("Error while trying to login", err);
+    }
+  };
+
+  const handleLogInWithGoogleOrFacebook = async (
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+    authProvider: "facebook" | "google"
+  ) => {
+    e.preventDefault();
+    try {
+      if (authProvider === "facebook") {
+        const provider = new FacebookAuthProvider();
+        await signInWithPopup(auth, provider);
+
+        router.push("/");
+      } else if (authProvider === "google") {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+
+        router.push("/");
+      } else {
+        return;
+      }
+    } catch (err) {
+      console.log(
+        `Error while trying to login with ${authProvider} provider: `,
+        err
+      );
+    }
+  };
+
+  const handleLogInWithFacebook = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+
+    try {
+      await logInWithEmailAndPassword(emailInput, passwordInput);
+
+      router.push("/");
     } catch (err) {
       console.log("Error while trying to login", err);
     }
@@ -119,7 +168,9 @@ export const Login: React.FC<ILoginProps> = ({ providers }) => {
                     <div className="flex justify-center items-center space-x-2 pt-4">
                       <div>
                         <a
-                          onClick={() => signIn("facebook")}
+                          onClick={(e) =>
+                            handleLogInWithGoogleOrFacebook(e, "facebook")
+                          }
                           className="flex cursor-pointer items-center space-x-2"
                         >
                           <svg
@@ -165,7 +216,9 @@ export const Login: React.FC<ILoginProps> = ({ providers }) => {
                           </span>
                         </a>
                         <a
-                          onClick={() => signIn("google")}
+                          onClick={(e) =>
+                            handleLogInWithGoogleOrFacebook(e, "google")
+                          }
                           className="flex cursor-pointer items-center space-x-2 mt-3"
                         >
                           <svg
