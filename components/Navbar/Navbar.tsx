@@ -2,7 +2,7 @@ import Link from "next/link";
 import React, { useRef, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useOnClickOutside } from "../../hooks/useOnClickOustide";
-import { CreatePostModal } from "./CreatePostModal";
+import { CreatePostModal } from "../Modal/CreatePostModal";
 
 interface INavbarProps {}
 
@@ -389,12 +389,13 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
           )}
         </div>
       </div>
-      <CreatePostModal
-        shown={isCreatePostModalOpen}
-        close={() => {
-          setIsCreatePostModalOpen(false);
-        }}
-      ></CreatePostModal>
+      {isCreatePostModalOpen && (
+        <CreatePostModal
+          open={isCreatePostModalOpen}
+          onClose={() => setIsCreatePostModalOpen(false)}
+          selector="createPostModal"
+        />
+      )}
     </>
   );
 };

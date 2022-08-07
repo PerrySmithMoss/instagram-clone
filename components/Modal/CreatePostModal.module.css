@@ -13,7 +13,7 @@
 }
 
 .modalContent {
-width: 70%;
+  width: 70%;
   max-height: 575px;
   /* min-height: 200px; */
   background-color: white;
@@ -28,8 +28,8 @@ width: 70%;
 
 .createPostModalSwitch:checked {
   right: 0;
-  border-color: #68D391;
+  border-color: #68d391;
 }
 .createPostModalSwitch:checked ~ label {
-  background-color: #68D391;
+  background-color: #68d391;
 }
