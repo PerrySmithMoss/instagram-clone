@@ -2,10 +2,9 @@ import Link from "next/link";
 import React, { useState } from "react";
 import AuthStyles from "./auth.module.css";
 import { useAuth } from "../../context/AuthContext";
-import { useRouter } from "next/router"
+import { useRouter } from "next/router";
 
-interface ISignUpProps {
-}
+interface ISignUpProps {}
 
 export const SignUp: React.FC<ISignUpProps> = () => {
   const { user, signUp, signUpWithGoogle, signUpWithFacebook } = useAuth();
@@ -15,8 +14,9 @@ export const SignUp: React.FC<ISignUpProps> = () => {
     username: "",
     password: "",
   });
+  const [signUpMessage, setSignUpMessage] = useState("");
 
-  const router = useRouter()
+  const router = useRouter();
 
   const onFormChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUserInputDetails({
@@ -31,9 +31,15 @@ export const SignUp: React.FC<ISignUpProps> = () => {
     e.preventDefault();
 
     try {
-      await signUp(userInputDetails);
+      const signUpRes = await signUp(userInputDetails);
 
-      router.push("/")
+      if (signUpRes.error === false) {
+        router.push("/");
+      } else if (signUpRes.error === true) {
+        if (signUpRes.error === true) {
+          setSignUpMessage(signUpRes.action);
+        }
+      }
     } catch (err) {
       console.log("Error while trying to login", err);
     }
@@ -47,7 +53,7 @@ export const SignUp: React.FC<ISignUpProps> = () => {
     try {
       await signUpWithGoogle();
 
-      router.push("/")
+      router.push("/");
     } catch (err) {
       console.log("Error while trying to sign up with Google", err);
     }
@@ -61,7 +67,7 @@ export const SignUp: React.FC<ISignUpProps> = () => {
     try {
       await signUpWithFacebook();
 
-      router.push("/")
+      router.push("/");
     } catch (err) {
       console.log("Error while trying to sign up with Facebook", err);
     }
@@ -247,6 +253,11 @@ export const SignUp: React.FC<ISignUpProps> = () => {
                         name="password"
                       />
                     </div>
+                    {signUpMessage && (
+                      <p className="mt-1 text-red-500  mx-10">
+                        {signUpMessage}
+                      </p>
+                    )}
                     <div className="py-3 mx-10">
                       <button
                         onClick={(e) => handleSignUp(e)}

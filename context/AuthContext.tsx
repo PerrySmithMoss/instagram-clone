@@ -10,10 +10,6 @@ import {
 import {
   addDoc,
   collection,
-  doc,
-  getDocs,
-  query,
-  where,
 } from "firebase/firestore";
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth, db } from "../firebase";
@@ -61,7 +57,7 @@ export const AuthContextProvider = ({
 
       const usersCollectionRef = collection(db, "users");
 
-      await addDoc(usersCollectionRef, {
+      const createUserRes = await addDoc(usersCollectionRef, {
         uid: user.uid,
         displayName: userDetails.username,
         email: user.email,
@@ -69,16 +65,39 @@ export const AuthContextProvider = ({
         fullName: userDetails.fullName,
         username: null,
       });
+
+      if (createUserRes) {
+        return {
+          error: false,
+          message: "User was created successfully",
+        };
+      }
     } catch (error: any) {
       if (error.code === "auth/email-already-in-use") {
-        console.log("That email address is already in use!");
-      }
+        console.error("That email address is already in use!");
 
-      if (error.code === "auth/invalid-email") {
-        console.log("That email address is invalid!");
-      }
+        return {
+          error: true,
+          message: "auth/email-already-in-use",
+          action: "Email address in use, please use another one.",
+        };
+      } else if (error.code === "auth/invalid-email") {
+        console.error("That email address is invalid!");
 
-      console.error(error);
+        return {
+          error: true,
+          messsge: "auth/invalid-email",
+          action: "Invalid email, please use another one.",
+        };
+      } else {
+        console.error(error);
+
+        return {
+          error: true,
+          message: error,
+          action: error,
+        };
+      }
     }
   };
 
@@ -124,10 +143,6 @@ export const AuthContextProvider = ({
     return signInWithEmailAndPassword(auth, email, password);
   };
 
-  const logInWithGoogle = (email: string, password: string) => {
-    return signInWithEmailAndPassword(auth, email, password);
-  };
-
   const logOut = async () => {
     setUser(null);
     await signOut(auth);
@@ -135,7 +150,14 @@ export const AuthContextProvider = ({
 
   return (
     <AuthContext.Provider
-      value={{ user, signUp, logInWithEmailAndPassword, logOut, signUpWithGoogle, signUpWithFacebook }}
+      value={{
+        user,
+        signUp,
+        logInWithEmailAndPassword,
+        logOut,
+        signUpWithGoogle,
+        signUpWithFacebook,
+      }}
     >
       {loading ? null : children}
     </AuthContext.Provider>
