@@ -16,15 +16,7 @@ export const Stories: React.FC<IStoriesProps> = ({}) => {
   }, []);
 
   return (
-    <div className="flex space-x-2 p-4 rounded-lg bg-white border border-gray-200 mt-5 overflow-x-scroll">
-      {/* {user && (
-        <Story
-          key={user.id}
-          uid={user.uid as string}
-          image={user.photoUrl as string}
-          username={user.username as string}
-        />
-      )} */}
+    <div className="flex space-x-2 p-4 rounded-lg bg-white border border-gray-200 mt-5 overflow-x-auto">
       {suggestions.map((profile: any) => (
         <Story
           key={profile.id}

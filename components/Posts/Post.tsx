@@ -1,11 +1,72 @@
-import React, { useState } from "react";
+import {
+  addDoc,
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+} from "firebase/firestore";
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../../context/AuthContext";
+import { db } from "../../firebase";
 import { Post as IPost } from "../../types/post";
 interface IPostProps {
   post: IPost;
 }
 
 export const Post: React.FC<IPostProps> = ({ post }) => {
+  const { user } = useAuth();
+
   const [comment, setComment] = useState("");
+  const [comments, setComments] = useState<any>([]);
+
+  const mostRecentComments = () => {};
+
+  useEffect(() => {
+    const unSub = onSnapshot(
+      query(
+        collection(db, "posts", post.id, "comments"),
+        orderBy("timestamp", "desc")
+      ),
+      (querySnapshot) => {
+        const documents = querySnapshot.docs.map((doc) => {
+          return {
+            ...doc.data(),
+            id: doc.id,
+          };
+        });
+        setComments(documents);
+      }
+    );
+
+    return () => unSub();
+  }, [db]);
+
+  console.log("comments: ", comments);
+
+  const handleCommentInputKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === "Enter") {
+      if (comment.length > 0) {
+        postComment();
+      }
+    }
+  };
+
+  const postComment = async () => {
+    const commentToSend = comment;
+    setComment("");
+
+    await addDoc(collection(db, "posts", post.id, "comments"), {
+      comment: commentToSend,
+      uid: user.uid,
+      username: user.username,
+      userAvatar: user.photoUrl,
+      timestamp: serverTimestamp(),
+    });
+  };
+
   return (
     <div className="bg-white my-7 border rounded-lg">
       <div className="flex justify-between items-center p-2">
@@ -131,9 +192,43 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
             </div>
             <div>{post.caption}</div>
           </div>
-          <div className="mt-2">
-            <span className="text-sm text-gray-500">View all 28 comments</span>
-          </div>
+          {comments.length > 4 ? (
+            <div className="mt-1">
+              <span className="text-sm text-gray-500">
+                View all {comments.length} comments
+              </span>
+              {comments.slice(0, 2).map((comment: any) => (
+                <div
+                  key={comment.id}
+                  className="flex items-center space-x-1 mt-0.5"
+                >
+                  <div>
+                    <span className="text-sm font-bold">
+                      {comment.username}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-sm">{comment.comment}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-2">
+              {comments.map((comment: any) => (
+                <div key={comment.id} className="flex items-center space-x-1">
+                  <div>
+                    <span className="text-sm font-bold">
+                      {comment.username}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-sm">{comment.comment}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
           <div className="post-date mt-2">
             <span className="text-xs text-gray-500 uppercase">
               12 hours ago
@@ -152,11 +247,17 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
             </div>
             <input
               type="text"
+              value={comment}
+              onKeyDown={handleCommentInputKeyDown}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setComment(e.target.value)
+              }
               className="text-sm h-10 ml-4 w-full outline-none focus:outline-none"
               placeholder="Add a comment..."
             />
             <button
-              disabled={!comment}
+              onClick={postComment}
+              disabled={!comment.trim()}
               className="text-blue-500 opacity-75 text-sm text-right font-bold disabled:opacity-40"
             >
               Post
