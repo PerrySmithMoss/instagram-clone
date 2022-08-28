@@ -1,6 +1,20 @@
 import React, { RefObject, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import CreatePostModalStyles from "./CreatePostModal.module.css";
+import { useAuth } from "../../context/AuthContext";
+import { db, storage } from "../../firebase";
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
+import {
+  getDownloadURL,
+  ref as storageRef,
+  uploadString,
+} from "firebase/storage";
 
 // import { toast } from "react-toastify";
 
@@ -15,6 +29,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
   onClose,
   selector,
 }) => {
+  const { user } = useAuth();
   const ref = useRef<any>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -23,10 +38,13 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
   >(null);
   const filePickerRef = useRef<HTMLInputElement>(null);
   const [postCaption, setPostCaption] = useState("");
+  const [postLocation, setPostLocation] = useState("");
   const [accessibilityText, setAccessibilityText] = useState("");
   const [isTurnOffCommentingTrue, setIsTurnOffCommentingTrue] = useState(false);
   const [isAccessibilityOpen, setIsAccessibilityOpen] = useState(false);
   const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
+
+  const [isCreatingPost, setIsCreatingPost] = useState(false);
 
   const addImageToPost = (e: React.ChangeEvent<HTMLInputElement>) => {
     const reader = new FileReader();
@@ -37,6 +55,71 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
     reader.onload = (readerEvent) => {
       setSelectedFile(readerEvent.target?.result);
     };
+  };
+
+  const uploadPost = async () => {
+    try {
+      const postsCollectionRef = collection(db, "posts");
+
+      const createPostRef = await addDoc(postsCollectionRef, {
+        uid: user.uid,
+        username: user.username,
+        userAvatar: user.photoUrl,
+        caption: postCaption,
+        location: postLocation,
+        timestamp: serverTimestamp(),
+      });
+
+      console.log("createPostRef: ", createPostRef);
+
+      const imageRef = storageRef(storage, `posts/${createPostRef.id}/image`);
+
+      await uploadString(imageRef, selectedFile as string, "data_url");
+
+      const downloadUrl = await getDownloadURL(imageRef);
+
+      await updateDoc(doc(db, "posts", createPostRef.id), {
+        image: downloadUrl,
+      });
+
+      if (downloadUrl) {
+        console.log("Post was uploaded successfully!");
+
+        // return {
+        //   error: false,
+        //   message: "Post was created successfully",
+        // };
+      }
+
+      onClose();
+      setSelectedFile(null);
+    } catch (error: any) {
+      if (error.code === "auth/email-already-in-use") {
+        console.error("That email address is already in use!");
+
+        // return {
+        //   error: true,
+        //   message: "auth/email-already-in-use",
+        //   action: "Email address in use, please use another one.",
+        // };
+      } else if (error.code === "auth/invalid-email") {
+        console.error("That email address is invalid!");
+
+        // return {
+        //   error: true,
+        //   messsge: "auth/invalid-email",
+        //   action: "Invalid email, please use another one.",
+        // };
+      } else {
+        console.error(error);
+
+        // return {
+        //   error: true,
+        //   message: error,
+        //   action: error,
+        // };
+      }
+    }
   };
 
   //   const showToastSuccess = () => {
@@ -125,7 +208,11 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                 <div className="flex items-center h-full mb-2">
                   {selectedFile ? (
                     <span className="mr-3">
-                      <button className="text-blue-400 font-medium hover:text-blue-500">
+                      <button
+                        disabled={!selectedFile}
+                        onClick={uploadPost}
+                        className="text-blue-400 font-medium hover:text-blue-500 disabled:bg-gray-500 disabled:cursor-not-allowed hover:disabled:bg-gray-300"
+                      >
                         Share
                       </button>
                     </span>
@@ -159,15 +246,19 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                       />
                     </div>
                     <div className="mt-4 overflow-y-scroll">
-                      <div className="flex content-center items-center mx-4">
+                      <div className="flex content-center items-center mx-2">
                         <div>
                           <img
                             className="rounded-full w-8 h-8"
-                            alt="Profile Picture"
-                            src="https://randomuser.me/api/portraits/women/68.jpg"
+                            alt="User's avatar"
+                            src={
+                              (user?.photoUrl as string)
+                                ? (user?.photoUrl as string)
+                                : "/assets/image/Navbar/default_profile_pic.jpeg"
+                            }
                           />
                         </div>
-                        <div className="flex-1 ml-4">
+                        <div className="flex-1 ml-2">
                           <h2 className="font-medium">perrymoss</h2>
                         </div>
                       </div>
@@ -194,7 +285,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                             </svg>
                           </div>
                           <div className=" ">
-                            <span className="text-gray-400">
+                            <span className="text-gray-300 text-sm">
                               {postCaption.length}/2,200
                             </span>
                           </div>
@@ -205,6 +296,10 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                             <input
                               maxLength={75}
                               type="text"
+                              value={postLocation}
+                              onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>
+                              ) => setPostLocation(e.target.value)}
                               placeholder="Add Location"
                               className="text-gray-700 outline-none"
                             />

@@ -219,7 +219,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
               <div className="relative cursor-pointer">
                 <div
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex w-8 h-8 justify-center items-center  mr-2 text-xl rounded-full text-white"
+                  className="flex w-9 h-9 justify-center items-center  mr-2 text-xl rounded-full text-white"
                 >
                   <img
                     className="rounded-full"

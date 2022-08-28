@@ -6,6 +6,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
+  updateProfile
 } from "firebase/auth";
 import {
   addDoc,
@@ -51,9 +52,11 @@ export const AuthContextProvider = ({
       const res = await createUserWithEmailAndPassword(
         auth,
         userDetails.email as string,
-        userDetails.password as string
+        userDetails.password as string,
       );
       const user = res.user;
+
+      await updateProfile(user, {displayName: userDetails.username})
 
       const usersCollectionRef = collection(db, "users");
 
@@ -63,7 +66,7 @@ export const AuthContextProvider = ({
         email: user.email,
         profilePicture: null,
         fullName: userDetails.fullName,
-        username: null,
+        username: userDetails.username,
       });
 
       if (createUserRes) {

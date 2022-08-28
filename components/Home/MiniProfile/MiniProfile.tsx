@@ -12,11 +12,15 @@ export const MiniProfile: React.FC<IMiniProfileProps> = ({}) => {
         <img
           className="rounded-full w-14 h-14"
           alt="Profile Picture"
-          src={user?.photoUrl}
+          src={
+            (user?.photoUrl as string)
+              ? (user?.photoUrl as string)
+              : "/assets/image/Navbar/default_profile_pic.jpeg"
+          }
         />
       </div>
-      <div className="flex-1 mx-4">
-        <h2 className="font-medium">{user?.username}</h2>
+      <div className="flex-1 mx-2">
+        <h2 className="font-medium">{user.username}</h2>
       </div>
       <div>
         <button className="text-blue-400 text-sm font-semibold">Switch</button>

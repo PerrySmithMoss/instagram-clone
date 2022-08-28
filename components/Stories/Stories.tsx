@@ -16,7 +16,7 @@ export const Stories: React.FC<IStoriesProps> = ({}) => {
   }, []);
 
   return (
-    <div className="flex space-x-2 p-4 bg-white border border-gray-200 mt-5 overflow-x-scroll">
+    <div className="flex space-x-2 p-4 rounded-lg bg-white border border-gray-200 mt-5 overflow-x-scroll">
       {/* {user && (
         <Story
           key={user.id}

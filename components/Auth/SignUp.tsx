@@ -29,7 +29,7 @@ export const SignUp: React.FC<ISignUpProps> = () => {
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
-
+    
     try {
       const signUpRes = await signUp(userInputDetails);
 

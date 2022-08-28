@@ -1,19 +1,31 @@
-import React from "react";
-
+import React, { useState } from "react";
+import { Post as IPost } from "../../types/post";
 interface IPostProps {
-  post: any;
+  post: IPost;
 }
 
 export const Post: React.FC<IPostProps> = ({ post }) => {
+  const [comment, setComment] = useState("");
   return (
-    <div className="bg-white my-7 border rounded-sm">
-      <div className="flex items-center p-3">
-        <img
-          className="rounded-full h-10 w-10 object-contain border p-1 mr-3"
-          src={post.userAvatar}
-          alt=""
-        />
-        <p className="flex-1 font-medium">{post.username}</p>
+    <div className="bg-white my-7 border rounded-lg">
+      <div className="flex justify-between items-center p-2">
+        <div className="flex items-center">
+          <div>
+            <img
+              className="rounded-full h-10 w-10 object-contain border mr-3"
+              src={
+                (post.userAvatar as string)
+                  ? (post.userAvatar as string)
+                  : "/assets/image/Navbar/default_profile_pic.jpeg"
+              }
+              alt=""
+            />
+          </div>
+          <div>
+            <p className="font-medium text-sm">{post.username}</p>
+            <p className="text-xs">{post.location}</p>
+          </div>
+        </div>
         <div className="mr-2">
           <svg
             aria-label="More options"
@@ -48,7 +60,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
         </div>
       </div>
       {/* Post Image */}
-      <img className="object-cover w-full" src={post.postImage} alt="" />
+      <img className="object-cover w-full" src={post.image} alt="" />
       {/* Buttons */}
       <div className="card-footer">
         <div className="top px-4 pt-4">
@@ -113,14 +125,16 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
           <div className="likes mt-2">
             <span className="font-bold text-sm">122,780 likes</span>
           </div>
-          <div className="caption text-sm mt-2">
-            <b>apple </b>
-            new Iphone release ✨
+          <div className="caption text-sm mt-2 flex space-x-1">
+            <div>
+              <b>{post.username}</b>
+            </div>
+            <div>{post.caption}</div>
           </div>
-          <div>
+          <div className="mt-2">
             <span className="text-sm text-gray-500">View all 28 comments</span>
           </div>
-          <div className="post-date">
+          <div className="post-date mt-2">
             <span className="text-xs text-gray-500 uppercase">
               12 hours ago
             </span>
@@ -136,13 +150,15 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                 <path d="M10 20a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM6.5 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm7 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm2.16 3a6 6 0 0 1-11.32 0h11.32z" />
               </svg>
             </div>
-            {/* </button> */}
             <input
               type="text"
-              className="text-sm h-10 ml-4 w-full outline-none focus:outline-none w-10/12"
+              className="text-sm h-10 ml-4 w-full outline-none focus:outline-none"
               placeholder="Add a comment..."
             />
-            <button className="text-blue-500 opacity-75 w-2/12 text-right font-bold">
+            <button
+              disabled={!comment}
+              className="text-blue-500 opacity-75 text-sm text-right font-bold disabled:opacity-40"
+            >
               Post
             </button>
           </div>
