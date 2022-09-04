@@ -19,6 +19,7 @@ class MyDocument extends Document {
         <body>
           <Main />
           <div id="createPostModal" />
+          <div id="viewPostModal" />
           <NextScript />
         </body>
       </Html>

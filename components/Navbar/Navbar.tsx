@@ -2,7 +2,7 @@ import Link from "next/link";
 import React, { useRef, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useOnClickOutside } from "../../hooks/useOnClickOustide";
-import { CreatePostModal } from "../Modal/CreatePostModal";
+import { CreatePostModal } from "../Modal/CreatePost/CreatePostModal";
 
 interface INavbarProps {}
 

@@ -7,7 +7,7 @@ export const MiniProfile: React.FC<IMiniProfileProps> = ({}) => {
   const { user } = useAuth();
 
   return (
-    <div className="flex items-center justify-between mt-8 ml-10 w-full">
+    <div className="flex items-center justify-between mt-5 ml-10 w-full">
       <div>
         <img
           className="rounded-full w-14 h-14"

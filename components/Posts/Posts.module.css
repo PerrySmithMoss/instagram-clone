@@ -1,0 +1,23 @@
+.likeButtonContainer {
+  cursor: pointer;
+}
+
+.likeButtonContainer:hover > svg {
+  /* fill: #5a5a5a; */
+  opacity: 0.6;
+}
+
+.createPostModalContentInner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 520px;
+}
+.postUserAvatar {
+  height: fit-content;
+  width: fit-content;
+}
+
+.iconContainer:hover > svg {
+  opacity: 0.6;
+}

@@ -1,8 +1,8 @@
 import React, { RefObject, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import CreatePostModalStyles from "./CreatePostModal.module.css";
-import { useAuth } from "../../context/AuthContext";
-import { db, storage } from "../../firebase";
+import { useAuth } from "../../../context/AuthContext";
+import { db, storage } from "../../../firebase";
 import {
   addDoc,
   collection,
@@ -70,8 +70,6 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
         timestamp: serverTimestamp(),
       });
 
-      console.log("createPostRef: ", createPostRef);
-
       const imageRef = storageRef(storage, `posts/${createPostRef.id}/image`);
 
       await uploadString(imageRef, selectedFile as string, "data_url");
@@ -83,7 +81,6 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
       });
 
       if (downloadUrl) {
-        console.log("Post was uploaded successfully!");
 
         // return {
         //   error: false,
@@ -259,7 +256,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                           />
                         </div>
                         <div className="flex-1 ml-2">
-                          <h2 className="font-medium">perrymoss</h2>
+                          <h2 className="font-medium">{user.username}</h2>
                         </div>
                       </div>
                       <div className="mt-4 ">
