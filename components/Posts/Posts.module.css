@@ -21,3 +21,7 @@
 .iconContainer:hover > svg {
   opacity: 0.6;
 }
+
+.likeButton:hover > svg {
+  opacity: 0.6;
+}

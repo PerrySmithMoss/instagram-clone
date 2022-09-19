@@ -1,13 +1,16 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
+  doc,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
+  setDoc,
 } from "firebase/firestore";
-import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import TimeAgo from "react-timeago";
 import { useAuth } from "../../context/AuthContext";
 import { db } from "../../firebase";
 import { Post as IPost } from "../../types/post";
@@ -21,9 +24,13 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
   const { user } = useAuth();
 
   const [comment, setComment] = useState("");
-  const [comments, setComments] = useState<any>([]);
+  const [modalComment, setModalComment] = useState("");
+  const [comments, setComments] = useState<any[]>([]);
+  const [likes, setLikes] = useState<any[]>([]);
+  const [hasLikedPost, setHasLikedPost] = useState(false);
 
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
+  const [visableComments, setVisableComments] = useState(5);
 
   const handleViewAllComments = () => {
     setIsPostModalOpen(true);
@@ -52,6 +59,44 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
     });
   };
 
+  const handleModalCommentInputKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === "Enter") {
+      if (modalComment.length > 0) {
+        postModalComment();
+      }
+    }
+  };
+
+  const postModalComment = async () => {
+    const commentToSend = modalComment;
+    setModalComment("");
+
+    await addDoc(collection(db, "posts", post.id, "comments"), {
+      comment: commentToSend,
+      uid: user.uid,
+      username: user.username,
+      userAvatar: user.photoUrl,
+      timestamp: serverTimestamp(),
+    });
+  };
+
+  const handleLoadMoreComments = () => {
+    setVisableComments((prevValue) => prevValue + 5);
+  };
+
+  async function likePost() {
+    if (hasLikedPost) {
+      await deleteDoc(doc(db, "posts", post.id, "likes", user.uid));
+    } else {
+      await setDoc(doc(db, "posts", post.id, "likes", user.uid), {
+        username: user?.username,
+        userAvatar: user?.photoUrl,
+      });
+    }
+  }
+
   useEffect(() => {
     const unSub = onSnapshot(
       query(
@@ -70,7 +115,34 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
     );
 
     return () => unSub();
-  }, [db]);
+  }, [db, post.id]);
+
+  useEffect(() => {
+    const unSub = onSnapshot(
+      query(
+        collection(db, "posts", post.id, "likes")
+      ),
+      (querySnapshot) => {
+        const documents = querySnapshot.docs.map((doc) => {
+          return {
+            ...doc.data(),
+            id: doc.id,
+          };
+        });
+        setLikes(documents);
+      }
+    );
+
+    return () => unSub();
+  }, [db, post.id]);
+
+  useEffect(
+    () =>
+      setHasLikedPost(
+        likes.findIndex((like: any) => like.id === user?.uid) !== -1
+      ),
+    [likes]
+  );
 
   return (
     <div className="bg-white my-7 border rounded-lg">
@@ -133,19 +205,42 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
           <div className="top px-4 pt-4">
             <div className="icons flex flex-row justify-between items-center">
               <div className="left flex flex-row">
-                <div className="like mr-4">
-                  <svg
-                    aria-label="Like"
-                    className="_8-yf5 "
-                    fill="#262626"
-                    height="24"
-                    viewBox="0 0 48 48"
-                    width="24"
+                {hasLikedPost ? (
+                  <div
+                    onClick={likePost}
+                    className={`${styles.likeButton} like mr-4 cursor-pointer`}
                   >
-                    <path d="M34.6 6.1c5.7 0 10.4 5.2 10.4 11.5 0 6.8-5.9 11-11.5 16S25 41.3 24 41.9c-1.1-.7-4.7-4-9.5-8.3-5.7-5-11.5-9.2-11.5-16C3 11.3 7.7 6.1 13.4 6.1c4.2 0 6.5 2 8.1 4.3 1.9 2.6 2.2 3.9 2.5 3.9.3 0 .6-1.3 2.5-3.9 1.6-2.3 3.9-4.3 8.1-4.3m0-3c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5.6 0 1.1-.2 1.6-.5 1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z"></path>
-                  </svg>
-                </div>
-                <div className="comment mr-4">
+                    <svg
+                      aria-label="Unlike"
+                      color="#ed4956"
+                      fill="#ed4956"
+                      height="24"
+                      role="img"
+                      viewBox="0 0 48 48"
+                      width="24"
+                    >
+                      <path d="M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z"></path>
+                    </svg>
+                  </div>
+                ) : (
+                  <div
+                    onClick={likePost}
+                    className={`${styles.likeButton} like mr-4 cursor-pointer`}
+                  >
+                    <svg
+                      aria-label="Like"
+                      fill="#262626"
+                      height="24"
+                      viewBox="0 0 48 48"
+                      width="24"
+                    >
+                      <path d="M34.6 6.1c5.7 0 10.4 5.2 10.4 11.5 0 6.8-5.9 11-11.5 16S25 41.3 24 41.9c-1.1-.7-4.7-4-9.5-8.3-5.7-5-11.5-9.2-11.5-16C3 11.3 7.7 6.1 13.4 6.1c4.2 0 6.5 2 8.1 4.3 1.9 2.6 2.2 3.9 2.5 3.9.3 0 .6-1.3 2.5-3.9 1.6-2.3 3.9-4.3 8.1-4.3m0-3c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5.6 0 1.1-.2 1.6-.5 1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z"></path>
+                    </svg>
+                  </div>
+                )}
+                <div
+                  className={`${styles.iconContainer} comment mr-4 cursor-pointer`}
+                >
                   <svg
                     aria-label="Comment"
                     className="_8-yf5 "
@@ -161,7 +256,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                     ></path>
                   </svg>
                 </div>
-                <div className="share">
+                <div className={`${styles.iconContainer} share cursor-pointer`}>
                   <svg
                     aria-label="Share Post"
                     className="_8-yf5 "
@@ -175,7 +270,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                 </div>
               </div>
               <div className="right">
-                <div className="save">
+                <div className={`${styles.iconContainer} save cursor-pointer`}>
                   <svg
                     aria-label="Save"
                     className="_8-yf5 "
@@ -190,7 +285,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
               </div>
             </div>
             <div className="likes mt-2">
-              <span className="font-bold text-sm">122,780 likes</span>
+              <span className="font-bold text-sm">{likes.length} likes</span>
             </div>
             <div className="text-sm mt-2">
               <p>
@@ -278,7 +373,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
             )}
             <div className="post-date mt-1">
               <span className="text-[11px] text-gray-500 uppercase">
-                12 hours ago
+                <TimeAgo date={post.timestamp?.toDate()} />
               </span>
             </div>
           </div>
@@ -294,6 +389,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
               </div>
               <input
                 type="text"
+                name="comment"
                 value={comment}
                 onKeyDown={handleCommentInputKeyDown}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -559,7 +655,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                                 {/* Posted time */}
                                 <div className="mt-1.5">
                                   <p className="text-[12px] text-gray-500">
-                                    12h
+                                    <TimeAgo date={post.timestamp.toDate()} />
                                   </p>
                                 </div>
                               </div>
@@ -567,102 +663,258 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                           </div>
                         </li>
                       </div>
-                      {comments.map((comment: any) => (
-                        <ul className="border-0 m-0 mb-4 p-0 list-none w-full">
-                          <div
-                            role="button"
-                            tabIndex={0}
-                            className="flex flex-col items-stretch flex-shrink-0 m-0 p-0 relative"
-                          >
-                            <li className="pb-0 overflow-visible py-[12px] px-0 w-auto list-none list-item relative mt-[-5px] mr-[-2px]">
-                              <div className=" items-start flex flex-row flex-shrink-0 justify-between m-0 p-0 relative">
-                                <div className="flex flex-row w-full">
-                                  <div
-                                    className={`block ${styles.postUserAvatar} pr-2 relative`}
-                                  >
-                                    <div
-                                      role="button"
-                                      tabIndex={-1}
-                                      className="block justify-center relative flex-none items-start"
-                                    >
-                                      <a className="w-[38px] h-[38px] flex flex-col min-w-0 rounded-full overflow-hidden p-0 m-0 relative">
-                                        <img
-                                          className="rounded-full w-10 h-10"
-                                          alt="User's avatar"
-                                          src={
-                                            (comment?.userAvatar as string)
-                                              ? (post?.userAvatar as string)
-                                              : "/assets/image/Navbar/default_profile_pic.jpeg"
-                                          }
-                                        />
-                                      </a>
-                                    </div>
-                                  </div>
-                                  <div className=" leading-[18px] items-stretch border-0 inline-block p-0 flex-shrink m-0 min-w-0 flex-col">
-                                    <h2
-                                      tabIndex={-1}
-                                      className="text-sm items-center inline-flex"
-                                    >
-                                      <div className="flex relative items-stretch flex-col mr-1">
-                                        <span className="inline relative">
-                                          <a className="font-bold text-sm inline-block border-0 relative p-0 ">
-                                            {comment.username}
-                                          </a>
-                                        </span>
-                                      </div>
-                                    </h2>
-                                    <div className="inline ml-0.5">
-                                      <p className="inline text-sm m-0 text-gray-900">
-                                        {comment.comment}
-                                      </p>
-                                    </div>
-                                    {/* Posted time */}
-                                    <div className="mt-1.5 flex flex-row items-center space-x-3">
-                                      <div>
-                                        <span className="text-[12px] text-gray-500">
-                                          12h
-                                        </span>
-                                      </div>
-                                      <div>
-                                        <span className="text-[12px] text-gray-500 font-bold">
-                                          2 likes
-                                        </span>
-                                      </div>
-                                      <div>
-                                        <span>
-                                          <button className="text-[12px] text-gray-500 hover:text-gray-600 font-bold p-0 m-0">
-                                            Reply
-                                          </button>
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                                <span
-                                  className={`${styles.iconContainer} mr-2 mt-[10px]`}
+                      {comments.length >= 5 ? (
+                        <div>
+                          {comments
+                            .slice(0, visableComments)
+                            .reverse()
+                            .map((comment: any) => (
+                              <ul className="border-0 m-0 mb-4 p-0 list-none w-full">
+                                <div
+                                  role="button"
+                                  tabIndex={0}
+                                  className="flex flex-col items-stretch flex-shrink-0 m-0 p-0 relative"
                                 >
+                                  <li className="pb-0 overflow-visible py-[12px] px-0 w-auto list-none list-item relative mt-[-5px] mr-[-2px]">
+                                    <div className=" items-start flex flex-row flex-shrink-0 justify-between m-0 p-0 relative">
+                                      <div className="flex flex-row w-full">
+                                        <div
+                                          className={`block ${styles.postUserAvatar} pr-2 relative`}
+                                        >
+                                          <div
+                                            role="button"
+                                            tabIndex={-1}
+                                            className="block justify-center relative flex-none items-start"
+                                          >
+                                            <a className="w-[38px] h-[38px] flex flex-col min-w-0 rounded-full overflow-hidden p-0 m-0 relative">
+                                              <img
+                                                className="rounded-full w-10 h-10"
+                                                alt="User's avatar"
+                                                src={
+                                                  (comment?.userAvatar as string)
+                                                    ? (post?.userAvatar as string)
+                                                    : "/assets/image/Navbar/default_profile_pic.jpeg"
+                                                }
+                                              />
+                                            </a>
+                                          </div>
+                                        </div>
+                                        <div className=" leading-[18px] items-stretch border-0 inline-block p-0 flex-shrink m-0 min-w-0 flex-col">
+                                          <h2
+                                            tabIndex={-1}
+                                            className="text-sm items-center inline-flex"
+                                          >
+                                            <div className="flex relative items-stretch flex-col mr-1">
+                                              <span className="inline relative">
+                                                <a className="font-bold text-sm inline-block border-0 relative p-0 ">
+                                                  {comment.username}
+                                                </a>
+                                              </span>
+                                            </div>
+                                          </h2>
+                                          <div className="inline ml-0.5">
+                                            <p className="inline text-sm m-0 text-gray-900">
+                                              {comment.comment}
+                                            </p>
+                                          </div>
+                                          {/* Posted time */}
+                                          <div className="mt-1.5 flex flex-row items-center space-x-3">
+                                            <div>
+                                              <span className="text-[12px] text-gray-500">
+                                                <TimeAgo
+                                                  date={comment.timestamp?.toDate()}
+                                                />
+                                              </span>
+                                            </div>
+                                            <div>
+                                              <span className="text-[12px] text-gray-500 font-bold">
+                                                2 likes
+                                              </span>
+                                            </div>
+                                            <div>
+                                              <span>
+                                                <button className="text-[12px] text-gray-500 hover:text-gray-600 font-bold p-0 m-0">
+                                                  Reply
+                                                </button>
+                                              </span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <span
+                                        className={`${styles.iconContainer} mr-2 mt-[10px]`}
+                                      >
+                                        <svg
+                                          aria-label="Like"
+                                          color="#262626"
+                                          fill="#262626"
+                                          height="14"
+                                          role="img"
+                                          viewBox="0 0 24 24"
+                                          width="14"
+                                        >
+                                          <path d="M16.792 3.904A4.989 4.989 0 0121.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 014.708-5.218 4.21 4.21 0 013.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 013.679-1.938m0-2a6.04 6.04 0 00-4.797 2.127 6.052 6.052 0 00-4.787-2.127A6.985 6.985 0 00.5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 003.518 3.018 2 2 0 002.174 0 45.263 45.263 0 003.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 00-6.708-7.218z"></path>
+                                        </svg>
+                                      </span>
+                                    </div>
+                                  </li>
+                                </div>
+                              </ul>
+                            ))}
+                          {visableComments < comments.length && (
+                            <div className="flex items-center justify-center pt-2 pb-6">
+                              <div>
+                                <button onClick={handleLoadMoreComments}>
                                   <svg
-                                    aria-label="Like"
+                                    aria-label="Load more comments"
+                                    // className="_ab6-"
                                     color="#262626"
                                     fill="#262626"
-                                    height="14"
+                                    height="24"
                                     role="img"
                                     viewBox="0 0 24 24"
-                                    width="14"
+                                    width="24"
                                   >
-                                    <path d="M16.792 3.904A4.989 4.989 0 0121.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 014.708-5.218 4.21 4.21 0 013.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 013.679-1.938m0-2a6.04 6.04 0 00-4.797 2.127 6.052 6.052 0 00-4.787-2.127A6.985 6.985 0 00.5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 003.518 3.018 2 2 0 002.174 0 45.263 45.263 0 003.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 00-6.708-7.218z"></path>
+                                    <circle
+                                      cx="12.001"
+                                      cy="12.005"
+                                      fill="none"
+                                      r="10.5"
+                                      stroke="currentColor"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      stroke-width="2"
+                                    ></circle>
+                                    <line
+                                      fill="none"
+                                      stroke="currentColor"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      stroke-width="2"
+                                      x1="7.001"
+                                      x2="17.001"
+                                      y1="12.005"
+                                      y2="12.005"
+                                    ></line>
+                                    <line
+                                      fill="none"
+                                      stroke="currentColor"
+                                      stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      stroke-width="2"
+                                      x1="12.001"
+                                      x2="12.001"
+                                      y1="7.005"
+                                      y2="17.005"
+                                    ></line>
                                   </svg>
-                                </span>
+                                </button>
                               </div>
-                            </li>
-                          </div>
-                        </ul>
-                      ))}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div>
+                          {comments.map((comment: any) => (
+                            <ul className="border-0 m-0 mb-4 p-0 list-none w-full">
+                              <div
+                                role="button"
+                                tabIndex={0}
+                                className="flex flex-col items-stretch flex-shrink-0 m-0 p-0 relative"
+                              >
+                                <li className="pb-0 overflow-visible py-[12px] px-0 w-auto list-none list-item relative mt-[-5px] mr-[-2px]">
+                                  <div className=" items-start flex flex-row flex-shrink-0 justify-between m-0 p-0 relative">
+                                    <div className="flex flex-row w-full">
+                                      <div
+                                        className={`block ${styles.postUserAvatar} pr-2 relative`}
+                                      >
+                                        <div
+                                          role="button"
+                                          tabIndex={-1}
+                                          className="block justify-center relative flex-none items-start"
+                                        >
+                                          <a className="w-[38px] h-[38px] flex flex-col min-w-0 rounded-full overflow-hidden p-0 m-0 relative">
+                                            <img
+                                              className="rounded-full w-10 h-10"
+                                              alt="User's avatar"
+                                              src={
+                                                (comment?.userAvatar as string)
+                                                  ? (post?.userAvatar as string)
+                                                  : "/assets/image/Navbar/default_profile_pic.jpeg"
+                                              }
+                                            />
+                                          </a>
+                                        </div>
+                                      </div>
+                                      <div className=" leading-[18px] items-stretch border-0 inline-block p-0 flex-shrink m-0 min-w-0 flex-col">
+                                        <h2
+                                          tabIndex={-1}
+                                          className="text-sm items-center inline-flex"
+                                        >
+                                          <div className="flex relative items-stretch flex-col mr-1">
+                                            <span className="inline relative">
+                                              <a className="font-bold text-sm inline-block border-0 relative p-0 ">
+                                                {comment.username}
+                                              </a>
+                                            </span>
+                                          </div>
+                                        </h2>
+                                        <div className="inline ml-0.5">
+                                          <p className="inline text-sm m-0 text-gray-900">
+                                            {comment.comment}
+                                          </p>
+                                        </div>
+                                        {/* Posted time */}
+                                        <div className="mt-1.5 flex flex-row items-center space-x-3">
+                                          <div>
+                                            <span className="text-[12px] text-gray-500">
+                                              <TimeAgo
+                                                date={comment.timestamp?.toDate()}
+                                              />
+                                            </span>
+                                          </div>
+                                          <div>
+                                            <span className="text-[12px] text-gray-500 font-bold">
+                                              2 likes
+                                            </span>
+                                          </div>
+                                          <div>
+                                            <span>
+                                              <button className="text-[12px] text-gray-500 hover:text-gray-600 font-bold p-0 m-0">
+                                                Reply
+                                              </button>
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <span
+                                      className={`${styles.iconContainer} mr-2 mt-[10px]`}
+                                    >
+                                      <svg
+                                        aria-label="Like"
+                                        color="#262626"
+                                        fill="#262626"
+                                        height="14"
+                                        role="img"
+                                        viewBox="0 0 24 24"
+                                        width="14"
+                                      >
+                                        <path d="M16.792 3.904A4.989 4.989 0 0121.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 014.708-5.218 4.21 4.21 0 013.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 013.679-1.938m0-2a6.04 6.04 0 00-4.797 2.127 6.052 6.052 0 00-4.787-2.127A6.985 6.985 0 00.5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 003.518 3.018 2 2 0 002.174 0 45.263 45.263 0 003.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 00-6.708-7.218z"></path>
+                                      </svg>
+                                    </span>
+                                  </div>
+                                </li>
+                              </div>
+                            </ul>
+                          ))}
+                        </div>
+                      )}
                     </ul>
                   </div>
                   <div className="order-5 pl-4 mb-4">
                     <p className="uppercase text-[10px] text-gray-500">
-                      12 hours ago
+                      <TimeAgo date={post.timestamp?.toDate()} />
                     </p>
                   </div>
                   <div className="flex justify-between pb-3.5 pt-3.5 px-4 order-6 border-t">
@@ -682,18 +934,25 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                       </div>
                       <div className="w-full ">
                         {" "}
-                        <textarea
+                        <input
                           aria-label="Add a comment…"
                           placeholder="Add a comment…"
+                          type="text"
+                          name="modalComment"
+                          value={modalComment}
+                          onKeyDown={handleModalCommentInputKeyDown}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setModalComment(e.target.value)
+                          }
                           className="bg-transparent text-sm border-0 flex h-[18px] flex-grow max-h-[80px] outline-none p-0 m-0 w-full resize-none max-w-full"
                           autoComplete="off"
                           autoCorrect="off"
-                        ></textarea>
+                        ></input>
                       </div>
                     </div>
                     <button
-                      onClick={postComment}
-                      disabled={!comment.trim()}
+                      onClick={postModalComment}
+                      disabled={!modalComment.trim()}
                       className="text-blue-500 opacity-75 text-sm text-right font-bold disabled:opacity-40"
                     >
                       <div>Post</div>
