@@ -1,0 +1,11 @@
+.iconContainer:hover > svg {
+  opacity: 0.6;
+}
+
+.likeButton:hover > svg {
+  opacity: 0.6;
+}
+.postUserAvatar {
+  height: fit-content;
+  width: fit-content;
+}
