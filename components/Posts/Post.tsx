@@ -9,7 +9,7 @@ import {
   serverTimestamp,
   setDoc,
 } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import TimeAgo from "react-timeago";
 import { useAuth } from "../../context/AuthContext";
 import { db } from "../../firebase";
@@ -25,10 +25,15 @@ interface IPostProps {
 
 export const Post: React.FC<IPostProps> = ({ post }) => {
   const { user } = useAuth();
+  const commentInputRef = useRef<HTMLInputElement | null>(null);
 
   const [comment, setComment] = useState("");
   const [modalComment, setModalComment] = useState("");
   const [comments, setComments] = useState<any[]>([]);
+
+  const [isReply, setIsReply] = useState(false);
+  const [replyToCommentId, setReplyToCommentId] = useState("");
+
   const [likes, setLikes] = useState<any[]>([]);
   const [hasLikedPost, setHasLikedPost] = useState(false);
 
@@ -73,16 +78,39 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
   };
 
   const postModalComment = async () => {
-    const commentToSend = modalComment;
-    setModalComment("");
+    const commentToSend = modalComment.trim();
 
-    await addDoc(collection(db, "posts", post.id, "comments"), {
-      comment: commentToSend,
-      uid: user.uid,
-      username: user.username,
-      userAvatar: user.photoUrl,
-      timestamp: serverTimestamp(),
-    });
+    if (isReply && commentToSend.charAt(0) === "@") {
+      await addDoc(
+        collection(
+          db,
+          "posts",
+          post.id,
+          "comments",
+          replyToCommentId,
+          "comments"
+        ),
+        {
+          comment: commentToSend,
+          uid: user.uid,
+          username: user.username,
+          userAvatar: user.photoUrl,
+          timestamp: serverTimestamp(),
+        }
+      );
+    } else {
+      await addDoc(collection(db, "posts", post.id, "comments"), {
+        comment: commentToSend,
+        uid: user.uid,
+        username: user.username,
+        userAvatar: user.photoUrl,
+        timestamp: serverTimestamp(),
+      });
+    }
+
+    setModalComment("");
+    setIsReply(false);
+    setReplyToCommentId("");
   };
 
   const handleLoadMoreComments = () => {
@@ -100,18 +128,11 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
     }
   }
 
-  async function handleLikeComment(commentId: string) {
-    // if (hasLikedComment) {
-    //   await deleteDoc(doc(db, "posts", post.id, "comments", user.uid));
-    // } else {
-    await setDoc(
-      doc(db, "posts", post.id, "comments", commentId, "likes", user.uid),
-      {
-        username: user?.username,
-        userAvatar: user?.photoUrl,
-      }
-    );
+  async function handleAddComment(value: string) {
+    // if (modalComment.length === 0) {
+    //   setIsReply(false);
     // }
+    setModalComment(value);
   }
 
   useEffect(() => {
@@ -133,8 +154,6 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
 
     return () => unSub();
   }, [db, post.id]);
-
-  // console.log("comments: ", comments)
 
   useEffect(() => {
     const unSub = onSnapshot(
@@ -160,6 +179,8 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
       ),
     [likes]
   );
+
+  // console.log(comments)
 
   return (
     <div className="bg-white my-7 border rounded-lg">
@@ -327,7 +348,11 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                   .slice(0, 2)
                   .reverse()
                   .map((comment: any) => (
-                    <CommentUnderPost key={comment.id} comment={comment} postId={post.id} />
+                    <CommentUnderPost
+                      key={comment.id}
+                      comment={comment}
+                      postId={post.id}
+                    />
                   ))}
               </div>
             ) : (
@@ -336,7 +361,11 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                   .slice(0, 2)
                   .reverse()
                   .map((comment: any) => (
-                    <CommentUnderPost key={comment.id} comment={comment} postId={post.id} />
+                    <CommentUnderPost
+                      key={comment.id}
+                      comment={comment}
+                      postId={post.id}
+                    />
                   ))}
               </div>
             )}
@@ -641,17 +670,17 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                         <div>
                           {comments
                             .slice(0, visableComments)
-                            .reverse()
+                            // .reverse()
                             .map((comment: any) => (
-                              <ul className="border-0 m-0 mb-4 p-0 list-none w-full">
-                                <div
-                                  role="button"
-                                  tabIndex={0}
-                                  className="flex flex-col items-stretch flex-shrink-0 m-0 p-0 relative"
-                                >
-                                  <Comment postId={post.id} comment={comment} />
-                                </div>
-                              </ul>
+                              <Comment
+                                key={comment.id}
+                                postId={post.id}
+                                comment={comment}
+                                commentInputRef={commentInputRef}
+                                setModalComment={handleAddComment}
+                                setIsReply={setIsReply}
+                                setReplyToCommentId={setReplyToCommentId}
+                              />
                             ))}
                           {visableComments < comments.length && (
                             <div className="flex items-center justify-center pt-2 pb-6">
@@ -707,17 +736,19 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                         </div>
                       ) : (
                         <div>
-                          {comments.map((comment: any) => (
-                            <ul className="border-0 m-0 mb-4 p-0 list-none w-full">
-                              <div
-                                role="button"
-                                tabIndex={0}
-                                className="flex flex-col items-stretch flex-shrink-0 m-0 p-0 relative"
-                              >
-                                <Comment postId={post.id} comment={comment} />
-                              </div>
-                            </ul>
-                          ))}
+                          {comments
+                            // .reverse()
+                            .map((comment: any) => (
+                              <Comment
+                                key={comment.id}
+                                postId={post.id}
+                                comment={comment}
+                                commentInputRef={commentInputRef}
+                                setModalComment={handleAddComment}
+                                setIsReply={setIsReply}
+                                setReplyToCommentId={setReplyToCommentId}
+                              />
+                            ))}
                         </div>
                       )}
                     </ul>
@@ -747,13 +778,15 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                         <input
                           aria-label="Add a comment…"
                           placeholder="Add a comment…"
+                          ref={commentInputRef}
                           type="text"
                           name="modalComment"
                           value={modalComment}
                           onKeyDown={handleModalCommentInputKeyDown}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                            setModalComment(e.target.value)
-                          }
+                          // onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          //   setModalComment(e.target.value)
+                          // }
+                          onChange={(e) => handleAddComment(e.target.value)}
                           className="bg-transparent text-sm border-0 flex h-[18px] flex-grow max-h-[80px] outline-none p-0 m-0 w-full resize-none max-w-full"
                           autoComplete="off"
                           autoCorrect="off"
