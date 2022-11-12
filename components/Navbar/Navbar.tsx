@@ -1,18 +1,103 @@
+import {
+  collection,
+  endAt,
+  limit,
+  onSnapshot,
+  orderBy,
+  query,
+  startAt,
+  where,
+} from "firebase/firestore";
 import Link from "next/link";
-import React, { useRef, useState } from "react";
+import Image from "next/image";
+import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { db } from "../../firebase";
+import useDebounce from "../../hooks/useDebounce";
 import { useOnClickOutside } from "../../hooks/useOnClickOustide";
 import { CreatePostModal } from "../Modal/CreatePost/CreatePostModal";
+import { RotatingLines } from "react-loader-spinner";
 
 interface INavbarProps {}
 
 export const Navbar: React.FC<INavbarProps> = ({}) => {
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const { user, logOut, signIn } = useAuth();
+
+  const [searchInput, setSearchInput] = useState("");
+  const debouncedSearchTerm = useDebounce(searchInput, 1000);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isShowSearchResults, setIsShowSearchResults] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+
+  const { user, logOut } = useAuth();
 
   const profileRef = useRef(null);
   useOnClickOutside(profileRef, () => setIsProfileOpen(false));
+
+  const searchResultsRef = useRef(null);
+  const handleExitSearch = () => {
+    setIsShowSearchResults(false);
+  };
+  useOnClickOutside(searchResultsRef, handleExitSearch);
+
+  async function getUsers() {
+    // This is a very inefficient way to search for a user.
+    // Ideally you would do a fuzzy search.
+    // However, firebase is very limited on ways you can query data
+    const unSub = onSnapshot(
+      query(collection(db, "users"), limit(150)),
+      (querySnapshot) => {
+        const documents = querySnapshot.docs
+          .map((doc: any) => {
+            return {
+              ...doc.data(),
+              id: doc.id,
+            };
+          })
+          .filter(
+            (doc) =>
+              doc.fullName
+                .toLowerCase()
+                .includes(debouncedSearchTerm.toLowerCase()) ||
+              doc.displayName
+                .toLowerCase()
+                .includes(debouncedSearchTerm.toLowerCase())
+          );
+        setSearchResults(documents as any);
+      }
+    );
+
+    setIsSearching(false);
+    setIsShowSearchResults(true);
+
+    return unSub;
+  }
+
+  useEffect(() => {
+    if (debouncedSearchTerm.length === 0) {
+      setIsSearching(false);
+      setIsShowSearchResults(false);
+      return;
+    }
+
+    setIsSearching(true);
+    setIsShowSearchResults(true);
+
+    getUsers();
+  }, [debouncedSearchTerm]);
+
+  useEffect(() => {
+    if (searchInput.length === 0) {
+      setIsSearching(false);
+      setIsShowSearchResults(false);
+
+      return;
+    }
+
+    setIsSearching(true);
+    setIsShowSearchResults(true);
+  }, [searchInput]);
 
   return (
     <>
@@ -29,7 +114,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
           </Link>
           {/* Search */}
           <div className="hidden flex-1 md:flex items-center justify-center px-16 lg:ml-12">
-            <div className="max-w-lg w-full lg:max-w-xs">
+            <div className="max-w-lg w-full lg:max-w-xs relative">
               <label htmlFor="search" className="sr-only">
                 Search
               </label>
@@ -49,10 +134,95 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                 </div>
                 <input
                   id="search"
+                  name="search"
+                  onChange={(e) => setSearchInput(e.target.value)}
                   className="block w-full pl-10 pr-3 text-md py-[9px]   rounded-lg leading-5 bg-gray-100 placeholder:font-light placeholder-gray-500 focus:outline-none focus:placeholder-gray-400  transition duration-150 ease-in-out"
                   placeholder="Search"
-                  type="search"
+                  type="text"
                 />
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                  {isSearching ? (
+                    <RotatingLines
+                      strokeColor="grey"
+                      strokeWidth="5"
+                      animationDuration="0.75"
+                      width="18"
+                      visible={true}
+                    />
+                  ) : debouncedSearchTerm.length > 0 ? (
+                    <svg
+                      className="text-gray-300 rotate-45"
+                      stroke="currentColor"
+                      fill="currentColor"
+                      stroke-width="0"
+                      viewBox="0 0 16 16"
+                      height="14px"
+                      width="14px"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"></path>
+                    </svg>
+                  ) : null}
+                </div>
+                {!isSearching && isShowSearchResults ? (
+                  <div
+                    ref={searchResultsRef}
+                    className="absolute top-11 left-1/2 -translate-x-1/2 translate-y-0 pt-2"
+                  >
+                    <div className="relative bg-white border border-gray-200 rounded-md shadow-xl w-96">
+                      <div className="absolute top-0 w-4 h-4 origin-center transform rotate-45 left-1/2 -translate-x-1/2  -translate-y-2 bg-white border-t border-l border-gray-200 rounded-sm pointer-events-none"></div>
+                      <div className="relative pt-2 pb-2">
+                        {searchResults.length > 0 ? (
+                          <div className="flex flex-col overflow-x-hidden overflow-y-hidden">
+                            {searchResults.map((user: any) => (
+                              <div
+                                key={user.id}
+                                className="block py-2 px-5 cursor-pointer hover:bg-gray-200"
+                              >
+                                <div className="outline-none">
+                                  {/* <Link href={`/users/${user.id}`}> */}
+                                  <div className="flex flex-row justify-start items-center">
+                                    <div>
+                                      <img
+                                        src={
+                                          (user?.photoUrl as string)
+                                            ? (user?.photoUrl as string)
+                                            : "/assets/image/Navbar/default_profile_pic.jpeg"
+                                        }
+                                        width={44}
+                                        height={44}
+                                      />
+                                    </div>
+                                    <div>
+                                      <div className="ml-2 flex flex-col min-w-0 min-h-0 flex-auto justify-center">
+                                        <div>
+                                          <div className="inline m-0 text-sm leading-4 font-medium">
+                                            {user.displayName}
+                                          </div>
+                                        </div>
+                                        <div className="text-sm text-gray-500 leading-4">
+                                          {user.fullName}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  {/* </Link> */}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="p-3">
+                            <p className="text-center">
+                              No users could be found with the specified name.
+                              Please refine your search.
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>
