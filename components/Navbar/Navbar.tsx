@@ -135,13 +135,14 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                 <input
                   id="search"
                   name="search"
+                  value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   className="block w-full pl-10 pr-3 text-md py-[9px]   rounded-lg leading-5 bg-gray-100 placeholder:font-light placeholder-gray-500 focus:outline-none focus:placeholder-gray-400  transition duration-150 ease-in-out"
                   placeholder="Search"
                   type="text"
                 />
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                  {isSearching ? (
+                {isSearching ? (
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                     <RotatingLines
                       strokeColor="grey"
                       strokeWidth="5"
@@ -149,7 +150,12 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                       width="18"
                       visible={true}
                     />
-                  ) : debouncedSearchTerm.length > 0 ? (
+                  </div>
+                ) : searchInput.length > 0 ? (
+                  <div
+                    onClick={() => setSearchInput("")}
+                    className="absolute cursor-pointer  inset-y-0 right-0 pr-3 flex items-center"
+                  >
                     <svg
                       className="text-gray-300 rotate-45"
                       stroke="currentColor"
@@ -162,8 +168,8 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                     >
                       <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"></path>
                     </svg>
-                  ) : null}
-                </div>
+                  </div>
+                ) : null}
                 {!isSearching && isShowSearchResults ? (
                   <div
                     ref={searchResultsRef}
