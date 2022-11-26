@@ -6,12 +6,9 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
-  updateProfile
+  updateProfile,
 } from "firebase/auth";
-import {
-  addDoc,
-  collection,
-} from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth, db } from "../firebase";
 import { User } from "../types/user";
@@ -52,27 +49,33 @@ export const AuthContextProvider = ({
       const res = await createUserWithEmailAndPassword(
         auth,
         userDetails.email as string,
-        userDetails.password as string,
+        userDetails.password as string
       );
+
       const user = res.user;
 
-      await updateProfile(user, {displayName: userDetails.username})
+      if (user) {
+        await updateProfile(user, { displayName: userDetails.username });
 
-      const usersCollectionRef = collection(db, "users");
+        await setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          displayName: userDetails.username,
+          email: user.email,
+          profilePicture: null,
+          fullName: userDetails.fullName,
+          username: userDetails.username,
+        });
 
-      const createUserRes = await addDoc(usersCollectionRef, {
-        uid: user.uid,
-        displayName: userDetails.username,
-        email: user.email,
-        profilePicture: null,
-        fullName: userDetails.fullName,
-        username: userDetails.username,
-      });
-
-      if (createUserRes) {
         return {
           error: false,
-          message: "User was created successfully",
+          message: "Success",
+          action: "User created successfully.",
+        };
+      } else {
+        return {
+          error: true,
+          message: "Unsuccessfull",
+          action: "Could not create user with specified email/password.",
         };
       }
     } catch (error: any) {
@@ -111,15 +114,15 @@ export const AuthContextProvider = ({
 
     const user = res.user;
 
-    const usersCollectionRef = collection(db, "users");
-
-    await addDoc(usersCollectionRef, {
+    await setDoc(doc(db, "users", user.uid), {
       uid: user.uid,
       displayName: user.displayName,
       email: user.email,
       profilePicture: user.photoURL,
       fullName: user.displayName,
       username: null,
+    }).then((data) => {
+      console.log("User created successfully");
     });
   };
 
@@ -130,15 +133,15 @@ export const AuthContextProvider = ({
 
     const user = res.user;
 
-    const usersCollectionRef = collection(db, "users");
-
-    await addDoc(usersCollectionRef, {
+    await setDoc(doc(db, "users", user.uid), {
       uid: user.uid,
       displayName: user.displayName,
       email: user.email,
       profilePicture: user.photoURL,
       fullName: user.displayName,
       username: null,
+    }).then((data) => {
+      console.log("User created successfully");
     });
   };
 

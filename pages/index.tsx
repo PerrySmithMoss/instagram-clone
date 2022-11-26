@@ -8,7 +8,16 @@ import { useAuth } from "../context/AuthContext";
 const Home: NextPage = () => {
   const { user } = useAuth();
 
-  if (!user) return <Login />;
+  if (!user) return (
+    <div className="bg-gray-50 ">
+      <Head>
+        <title>Login | Instagram</title>
+        <meta name="description" content="Instagram" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <Login />;
+    </div>
+  );
   return (
     <div className="bg-gray-50 ">
       <Head>

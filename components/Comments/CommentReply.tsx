@@ -93,7 +93,6 @@ export const CommentReply: React.FC<ICommentReplyProps> = ({
     [likes]
   );
 
-  console.log("likes: ", likes);
   return (
     <li className="-mr-1 pb-0 overflow-visible py-[12px] px-0 w-auto list-none list-item relative">
       <div className=" items-start flex flex-row flex-shrink-0 justify-between m-0 p-0 relative">

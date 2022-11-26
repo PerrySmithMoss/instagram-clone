@@ -1,6 +1,8 @@
 import {
   collection,
+  doc,
   endAt,
+  getDocs,
   limit,
   onSnapshot,
   orderBy,
@@ -17,10 +19,12 @@ import useDebounce from "../../hooks/useDebounce";
 import { useOnClickOutside } from "../../hooks/useOnClickOustide";
 import { CreatePostModal } from "../Modal/CreatePost/CreatePostModal";
 import { RotatingLines } from "react-loader-spinner";
+import { useRouter } from "next/router";
 
 interface INavbarProps {}
 
 export const Navbar: React.FC<INavbarProps> = ({}) => {
+  const router = useRouter();
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
@@ -42,36 +46,27 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
   useOnClickOutside(searchResultsRef, handleExitSearch);
 
   async function getUsers() {
-    // This is a very inefficient way to search for a user.
-    // Ideally you would do a fuzzy search.
-    // However, firebase is very limited on ways you can query data
-    const unSub = onSnapshot(
-      query(collection(db, "users"), limit(150)),
-      (querySnapshot) => {
-        const documents = querySnapshot.docs
-          .map((doc: any) => {
-            return {
-              ...doc.data(),
-              id: doc.id,
-            };
-          })
-          .filter(
-            (doc) =>
-              doc.fullName
-                .toLowerCase()
-                .includes(debouncedSearchTerm.toLowerCase()) ||
-              doc.displayName
-                .toLowerCase()
-                .includes(debouncedSearchTerm.toLowerCase())
-          );
-        setSearchResults(documents as any);
-      }
+    const doc = query(
+      collection(db, "users"),
+      where("fullName", ">=", debouncedSearchTerm.toUpperCase()),
+      where("fullName", "<=", debouncedSearchTerm.toLowerCase() + "\uf8ff")
     );
+
+    getDocs(doc).then((querySnapshot) => {
+      let values: any = [];
+      querySnapshot.forEach((doc) => {
+        console.log(`${doc.id} => ${doc.data()}`);
+        let data = {
+          ...doc.data(),
+          id: doc.id,
+        };
+        values.push(data);
+      });
+      setSearchResults(values);
+    });
 
     setIsSearching(false);
     setIsShowSearchResults(true);
-
-    return unSub;
   }
 
   useEffect(() => {
@@ -108,8 +103,6 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
             <img
               src="/assets/image/Navbar/logo3.png"
               className="cursor-pointer"
-              //  layout="fill"
-              //  objectFit="contain"
             />
           </Link>
           {/* Search */}
@@ -160,7 +153,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                       className="text-gray-300 rotate-45"
                       stroke="currentColor"
                       fill="currentColor"
-                      stroke-width="0"
+                      strokeWidth="0"
                       viewBox="0 0 16 16"
                       height="14px"
                       width="14px"
@@ -182,6 +175,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                           <div className="flex flex-col overflow-x-hidden overflow-y-hidden">
                             {searchResults.map((user: any) => (
                               <div
+                                onClick={() => router.push(`/user/${user.uid}`)}
                                 key={user.id}
                                 className="block py-2 px-5 cursor-pointer hover:bg-gray-200"
                               >
@@ -348,41 +342,6 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
               </div>
               <div className=" cursor-pointer">
                 <svg
-                  aria-label="Find People"
-                  fill="#262626"
-                  color="#262626"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  width="24"
-                >
-                  <polygon
-                    fill="none"
-                    points="13.941 13.953 7.581 16.424 10.06 10.056 16.42 7.585 13.941 13.953"
-                    stroke="currentColor"
-                    strokeLinejoin="round"
-                    strokeLinecap="round"
-                    strokeWidth={2}
-                  ></polygon>
-                  <polygon
-                    fillRule="evenodd"
-                    points="10.06 10.056 13.949 13.945 7.581 16.424 10.06 10.056"
-                    stroke="currentColor"
-                    strokeLinejoin="round"
-                  ></polygon>
-                  <circle
-                    cx={12.001}
-                    cy={12.005}
-                    fill="none"
-                    strokeWidth={2}
-                    r={10.5}
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  ></circle>
-                </svg>
-              </div>
-              <div className=" cursor-pointer">
-                <svg
                   aria-label="Notifications"
                   fill="#262626"
                   height="24"
@@ -461,7 +420,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                             Profile
                           </a>
                         </div>
-                        <div className="flex content-center items-center w-full px-4 py-2 space-x-3 hover:bg-gray-50">
+                        {/* <div className="flex content-center items-center w-full px-4 py-2 space-x-3 hover:bg-gray-50">
                           <svg
                             aria-label="Profile"
                             fill="#262626"
@@ -539,7 +498,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                           >
                             Switch Accounts
                           </a>
-                        </div>
+                        </div> */}
                         <hr />
                         <button
                           onClick={() => logOut()}
