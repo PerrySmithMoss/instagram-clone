@@ -44,8 +44,6 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
   const [isAccessibilityOpen, setIsAccessibilityOpen] = useState(false);
   const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
 
-  const [isCreatingPost, setIsCreatingPost] = useState(false);
-
   const addImageToPost = (e: React.ChangeEvent<HTMLInputElement>) => {
     const reader = new FileReader();
     if (e.target.files![0]) {
@@ -80,42 +78,10 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
         image: downloadUrl,
       });
 
-      if (downloadUrl) {
-
-        // return {
-        //   error: false,
-        //   message: "Post was created successfully",
-        // };
-      }
-
       onClose();
       setSelectedFile(null);
     } catch (error: any) {
-      if (error.code === "auth/email-already-in-use") {
-        console.error("That email address is already in use!");
-
-        // return {
-        //   error: true,
-        //   message: "auth/email-already-in-use",
-        //   action: "Email address in use, please use another one.",
-        // };
-      } else if (error.code === "auth/invalid-email") {
-        console.error("That email address is invalid!");
-
-        // return {
-        //   error: true,
-        //   messsge: "auth/invalid-email",
-        //   action: "Invalid email, please use another one.",
-        // };
-      } else {
         console.error(error);
-
-        // return {
-        //   error: true,
-        //   message: error,
-        //   action: error,
-        // };
-      }
     }
   };
 

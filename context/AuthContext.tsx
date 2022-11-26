@@ -20,7 +20,7 @@ export const AuthContextProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   // console.log("User Context: ", user);
@@ -28,13 +28,7 @@ export const AuthContextProvider = ({
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setUser({
-          uid: user.uid,
-          email: user.email,
-          username: user.displayName,
-          fullName: user.displayName,
-          photoUrl: user.photoURL,
-        });
+        setUser(user);
       } else {
         setUser(null);
       }

@@ -1,28 +1,75 @@
+import { updateProfile } from "firebase/auth";
 import {
   collection,
   doc,
   getDoc,
   onSnapshot,
   query,
+  setDoc,
+  updateDoc,
   where,
 } from "firebase/firestore";
+import {
+  getDownloadURL,
+  uploadString,
+  ref as storageRef,
+} from "firebase/storage";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Oval } from "react-loader-spinner";
 import { Navbar } from "../../components/Navbar/Navbar";
 import { Post } from "../../components/User/Post";
-import { useGlobalContext } from "../../context/GlobalContext";
-import { db } from "../../firebase";
+import { useAuth } from "../../context/AuthContext";
+import { db, storage } from "../../firebase";
 
 const IndividualUser: NextPage = () => {
-  const { selectedUserId, setSelectedUserId } = useGlobalContext();
+  const { user: currentUser } = useAuth();
+
   const [user, setUser] = useState<any>();
   const [posts, setPosts] = useState<any>();
   const [foundUser, setFoundUser] = useState(false);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  const filePickerRef = useRef<HTMLInputElement>(null);
+  const [uploadedAvatar, setUploadedAvater] = useState(false);
+
+  const uploadUserAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const reader = new FileReader();
+
+    if (e.target.files![0]) {
+      reader.readAsDataURL(e.target.files![0]);
+    }
+
+    reader.onload = async (readerEvent) => {
+      try {
+        const imageRef = storageRef(
+          storage,
+          `avatars/${currentUser.uid}/image`
+        );
+
+        await uploadString(
+          imageRef,
+          readerEvent.target?.result as string,
+          "data_url"
+        );
+
+        const downloadUrl = await getDownloadURL(imageRef);
+
+        await updateProfile(currentUser, { photoURL: downloadUrl });
+
+        await updateDoc(doc(db, "users", currentUser.uid), {
+          profilePicture: downloadUrl,
+        }).then((_doc) => {
+          setUploadedAvater(true);
+        });
+      } catch (error: any) {
+        console.error(error);
+      }
+    };
+  };
 
   const getUser = async () => {
     const docRef = doc(db, `users/${router.query.id}`);
@@ -40,6 +87,7 @@ const IndividualUser: NextPage = () => {
       // doc.data() will be undefined in this case
       console.log("No such document!");
     }
+    setUploadedAvater(false);
   };
 
   useEffect(() => {
@@ -66,6 +114,12 @@ const IndividualUser: NextPage = () => {
   useEffect(() => {
     getUsersPosts();
   }, [foundUser]);
+
+  useEffect(() => {
+    if (uploadedAvatar) {
+      getUser();
+    }
+  }, [uploadedAvatar]);
 
   // Get user data from Firebase using userId from URL
   // if no userId then return page not found
@@ -111,68 +165,74 @@ const IndividualUser: NextPage = () => {
             <header className="flex flex-wrap items-center p-4 md:py-8">
               <div className="md:w-3/12 md:ml-16">
                 <div className="relative">
-                <img
-                  className="w-20 h-20 md:w-40 md:h-40 object-cover rounded-full"
-                  src={
-                    (user?.photoUrl as string)
-                      ? (user?.photoUrl as string)
-                      : "/assets/image/Navbar/default_profile_pic.jpeg"
-                  }
-                  alt="profile picture"
-                />
-                              <div
-                style={{ transform: 'translate(50%, 0%)' }}
-                className=" cursor-pointer top-2 right-24 absolute rounded-full"
-              >
-                <div
-                  //   onClick={() => setIsUpdateUserAvatarModalOpen(true)}
-                  aria-label="Update Profile Avatar"
-                  role="button"
-                  className="h-10 w-10 bg-gray-300 hover:bg-gray-400 flex justify-center rounded-full text-center items-center"
-                >
-                  <svg
-                    version="1.1"
-                    id="Capa_1"
-                    className="block mb-0.5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlnsXlink="http://www.w3.org/1999/xlink"
-                    x="0px"
-                    y="0px"
-                    viewBox="0 0 487 487"
-                    fill="#050505"
-                    height={18}
-                    width={18}
-                    xmlSpace="preserve"
+                  <img
+                    className="w-20 h-20 md:w-40 md:h-40 object-cover rounded-full"
+                    src={
+                      (user?.profilePicture as string)
+                        ? (user?.profilePicture as string)
+                        : "/assets/image/Navbar/default_profile_pic.jpeg"
+                    }
+                    alt="profile picture"
+                  />
+                  <div
+                    style={{ transform: "translate(50%, 0%)" }}
+                    className=" cursor-pointer top-2 right-24 absolute rounded-full"
                   >
-                    <g>
-                      <g>
-                        <path
-                          d="M308.1,277.95c0,35.7-28.9,64.6-64.6,64.6s-64.6-28.9-64.6-64.6s28.9-64.6,64.6-64.6S308.1,242.25,308.1,277.95z
+                    <div
+                      onClick={() => filePickerRef!.current!.click()}
+                      aria-label="Update Profile Avatar"
+                      role="button"
+                      className="h-10 w-10 bg-gray-300 hover:bg-gray-400 flex justify-center rounded-full text-center items-center"
+                    >
+                      <input
+                        ref={filePickerRef}
+                        onChange={uploadUserAvatar}
+                        type="file"
+                        hidden
+                      />
+                      <svg
+                        version="1.1"
+                        id="Capa_1"
+                        className="block mb-0.5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        xmlnsXlink="http://www.w3.org/1999/xlink"
+                        x="0px"
+                        y="0px"
+                        viewBox="0 0 487 487"
+                        fill="#050505"
+                        height={18}
+                        width={18}
+                        xmlSpace="preserve"
+                      >
+                        <g>
+                          <g>
+                            <path
+                              d="M308.1,277.95c0,35.7-28.9,64.6-64.6,64.6s-64.6-28.9-64.6-64.6s28.9-64.6,64.6-64.6S308.1,242.25,308.1,277.95z
 			 M440.3,116.05c25.8,0,46.7,20.9,46.7,46.7v122.4v103.8c0,27.5-22.3,49.8-49.8,49.8H49.8c-27.5,0-49.8-22.3-49.8-49.8v-103.9
 			v-122.3l0,0c0-25.8,20.9-46.7,46.7-46.7h93.4l4.4-18.6c6.7-28.8,32.4-49.2,62-49.2h74.1c29.6,0,55.3,20.4,62,49.2l4.3,18.6H440.3z
 			 M97.4,183.45c0-12.9-10.5-23.4-23.4-23.4c-13,0-23.5,10.5-23.5,23.4s10.5,23.4,23.4,23.4C86.9,206.95,97.4,196.45,97.4,183.45z
 			 M358.7,277.95c0-63.6-51.6-115.2-115.2-115.2s-115.2,51.6-115.2,115.2s51.6,115.2,115.2,115.2S358.7,341.55,358.7,277.95z"
-                        />
-                      </g>
-                    </g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                  </svg>
-                </div>
-              </div>
+                            />
+                          </g>
+                        </g>
+                        <g></g>
+                        <g></g>
+                        <g></g>
+                        <g></g>
+                        <g></g>
+                        <g></g>
+                        <g></g>
+                        <g></g>
+                        <g></g>
+                        <g></g>
+                        <g></g>
+                        <g></g>
+                        <g></g>
+                        <g></g>
+                        <g></g>
+                      </svg>
+                    </div>
+                  </div>
                 </div>
               </div>
 
