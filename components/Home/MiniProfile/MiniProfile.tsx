@@ -6,6 +6,8 @@ interface IMiniProfileProps {}
 export const MiniProfile: React.FC<IMiniProfileProps> = ({}) => {
   const { user } = useAuth();
 
+  console.log(user)
+
   return (
     <div className="flex items-center justify-between mt-5 ml-10 w-full">
       <div>
@@ -20,7 +22,7 @@ export const MiniProfile: React.FC<IMiniProfileProps> = ({}) => {
         />
       </div>
       <div className="flex-1 mx-2">
-        <h2 className="font-medium">{user.username}</h2>
+        <h2 className="font-medium">{user.displayName}</h2>
       </div>
       <div>
         <button className="text-blue-400 text-sm font-semibold">Switch</button>

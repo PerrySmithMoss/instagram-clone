@@ -55,7 +55,6 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
     getDocs(doc).then((querySnapshot) => {
       let values: any = [];
       querySnapshot.forEach((doc) => {
-        console.log(`${doc.id} => ${doc.data()}`);
         let data = {
           ...doc.data(),
           id: doc.id,
