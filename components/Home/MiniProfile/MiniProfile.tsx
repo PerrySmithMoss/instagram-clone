@@ -5,9 +5,6 @@ interface IMiniProfileProps {}
 
 export const MiniProfile: React.FC<IMiniProfileProps> = ({}) => {
   const { user } = useAuth();
-
-  console.log(user)
-
   return (
     <div className="flex items-center justify-between mt-5 ml-10 w-full">
       <div>

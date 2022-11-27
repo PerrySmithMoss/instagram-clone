@@ -58,6 +58,8 @@ export const AuthContextProvider = ({
           profilePicture: null,
           fullName: userDetails.fullName,
           username: userDetails.username,
+          following: ["9apvkdI9ZhSm8Ot1NignmKlicR93"],
+          followers: [],
         });
 
         return {
@@ -115,6 +117,8 @@ export const AuthContextProvider = ({
       profilePicture: user.photoURL,
       fullName: user.displayName,
       username: null,
+      following: ["9apvkdI9ZhSm8Ot1NignmKlicR93"],
+      followers: [],
     }).then((data) => {
       console.log("User created successfully");
     });
@@ -134,6 +138,8 @@ export const AuthContextProvider = ({
       profilePicture: user.photoURL,
       fullName: user.displayName,
       username: null,
+      following: ["9apvkdI9ZhSm8Ot1NignmKlicR93"],
+      followers: [],
     }).then((data) => {
       console.log("User created successfully");
     });
