@@ -154,7 +154,7 @@ export const Profile: React.FC<IProfileProps> = ({}) => {
 
   useEffect(() => {
     getUser();
-    getUsersPosts()
+    getUsersPosts();
   }, [router.query.id]);
 
   useEffect(() => {
@@ -210,11 +210,11 @@ export const Profile: React.FC<IProfileProps> = ({}) => {
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <Navbar />
-        <main>
+        <main className="max-w-[975px] mx-auto">
           <div className="lg:w-10/12 lg:mx-auto mb-8">
             <header className="flex flex-wrap items-center p-4 md:py-8">
               <div className="md:w-3/12 md:ml-16">
-                <div className="relative">
+                <div className="relative w-20 h-20 md:w-40 md:h-40">
                   <img
                     className="w-20 h-20 md:w-40 md:h-40 object-cover rounded-full"
                     src={
@@ -224,75 +224,77 @@ export const Profile: React.FC<IProfileProps> = ({}) => {
                     }
                     alt="profile picture"
                   />
-                  <div
-                    style={{ transform: "translate(50%, 0%)" }}
-                    className=" cursor-pointer top-2 right-28 absolute rounded-full"
-                  >
+                  {currentUser.uid === router.query.id ? (
                     <div
-                      onClick={() => filePickerRef!.current!.click()}
-                      aria-label="Update Profile Avatar"
-                      role="button"
-                      className="h-10 w-10 bg-gray-300 hover:bg-gray-400 flex justify-center rounded-full text-center items-center"
+                      // style={{ transform: "translate(50%, 0%)" }}
+                      className=" cursor-pointer top-2 right-5 absolute rounded-full"
                     >
-                      <input
-                        ref={filePickerRef}
-                        onChange={uploadUserAvatar}
-                        type="file"
-                        hidden
-                      />
-                      <svg
-                        version="1.1"
-                        id="Capa_1"
-                        className="block mb-0.5"
-                        xmlns="http://www.w3.org/2000/svg"
-                        xmlnsXlink="http://www.w3.org/1999/xlink"
-                        x="0px"
-                        y="0px"
-                        viewBox="0 0 487 487"
-                        fill="#050505"
-                        height={18}
-                        width={18}
-                        xmlSpace="preserve"
+                      <div
+                        onClick={() => filePickerRef!.current!.click()}
+                        aria-label="Update Profile Avatar"
+                        role="button"
+                        className="h-10 w-10 bg-gray-300 hover:bg-gray-400 flex justify-center rounded-full text-center items-center"
                       >
-                        <g>
+                        <input
+                          ref={filePickerRef}
+                          onChange={uploadUserAvatar}
+                          type="file"
+                          hidden
+                        />
+                        <svg
+                          version="1.1"
+                          id="Capa_1"
+                          className="block mb-0.5"
+                          xmlns="http://www.w3.org/2000/svg"
+                          xmlnsXlink="http://www.w3.org/1999/xlink"
+                          x="0px"
+                          y="0px"
+                          viewBox="0 0 487 487"
+                          fill="#050505"
+                          height={18}
+                          width={18}
+                          xmlSpace="preserve"
+                        >
                           <g>
-                            <path
-                              d="M308.1,277.95c0,35.7-28.9,64.6-64.6,64.6s-64.6-28.9-64.6-64.6s28.9-64.6,64.6-64.6S308.1,242.25,308.1,277.95z
+                            <g>
+                              <path
+                                d="M308.1,277.95c0,35.7-28.9,64.6-64.6,64.6s-64.6-28.9-64.6-64.6s28.9-64.6,64.6-64.6S308.1,242.25,308.1,277.95z
          M440.3,116.05c25.8,0,46.7,20.9,46.7,46.7v122.4v103.8c0,27.5-22.3,49.8-49.8,49.8H49.8c-27.5,0-49.8-22.3-49.8-49.8v-103.9
         v-122.3l0,0c0-25.8,20.9-46.7,46.7-46.7h93.4l4.4-18.6c6.7-28.8,32.4-49.2,62-49.2h74.1c29.6,0,55.3,20.4,62,49.2l4.3,18.6H440.3z
          M97.4,183.45c0-12.9-10.5-23.4-23.4-23.4c-13,0-23.5,10.5-23.5,23.4s10.5,23.4,23.4,23.4C86.9,206.95,97.4,196.45,97.4,183.45z
          M358.7,277.95c0-63.6-51.6-115.2-115.2-115.2s-115.2,51.6-115.2,115.2s51.6,115.2,115.2,115.2S358.7,341.55,358.7,277.95z"
-                            />
+                              />
+                            </g>
                           </g>
-                        </g>
-                        <g></g>
-                        <g></g>
-                        <g></g>
-                        <g></g>
-                        <g></g>
-                        <g></g>
-                        <g></g>
-                        <g></g>
-                        <g></g>
-                        <g></g>
-                        <g></g>
-                        <g></g>
-                        <g></g>
-                        <g></g>
-                        <g></g>
-                      </svg>
+                          <g></g>
+                          <g></g>
+                          <g></g>
+                          <g></g>
+                          <g></g>
+                          <g></g>
+                          <g></g>
+                          <g></g>
+                          <g></g>
+                          <g></g>
+                          <g></g>
+                          <g></g>
+                          <g></g>
+                          <g></g>
+                          <g></g>
+                        </svg>
+                      </div>
                     </div>
-                  </div>
+                  ) : null}
                 </div>
               </div>
 
               <div className="w-7/12 ml-4">
                 <div className="xs:flex xs:flex-wrap xs:items-center mb-4">
-                  <h2 className="text-3xl inline-block font-light xs:mr-2 mb-2 sm:mb-0">
+                  <h2 className="text-xl xs:text-3xl text-gray-700 inline-block xs:mr-2 xs:mb-2 sm:mb-0 overflow-hidden text-ellipsis whitespace-nowrap">
                     {user.username}
                   </h2>
                   {currentUser.uid === router.query.id ? (
-                    <div className="xs:ml-6 mt-1 xs:mt-0 flex items-center space-x-4">
+                    <div className="mt-1 xs:mt-0 flex items-center space-x-4">
                       <div>
                         <button className="bg-transparent border text-black px-3 py-1 font-semibold text-sm rounded text-center sm:inline-block block">
                           Edit profile
@@ -414,7 +416,7 @@ sm:inline-block block"
 
             <div className="px-px md:px-3">
               <ul
-                className="flex md:hidden justify-around space-x-8 border-t 
+                className="flex md:hidden justify-around space-x-8 border-t  border-b
           text-center p-2 text-gray-600 leading-snug text-sm"
               >
                 <li>
@@ -441,11 +443,76 @@ sm:inline-block block"
               <ul
                 className="hidden md:flex items-center justify-around md:justify-center space-x-12  
               uppercase tracking-widest font-semibold text-xs text-gray-600
-              border-t"
+              border-t border-b py-2"
               >
-                <li className="md:border-t md:border-gray-700 md:-mt-px md:text-gray-700">
-                  <a className="inline-block p-3" href="#">
-                    <span className="hidden md:inline">Posts</span>
+                <li className="md:-mt-px md:text-gray-700 flex items-center">
+                  <svg
+                    aria-label=""
+                    color="#262626"
+                    fill="#262626"
+                    height="14"
+                    role="img"
+                    viewBox="0 0 24 24"
+                    width="14"
+                  >
+                    <rect
+                      fill="none"
+                      height="18"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      width="18"
+                      x="3"
+                      y="3"
+                    ></rect>
+                    <line
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      x1="9.015"
+                      x2="9.015"
+                      y1="3"
+                      y2="21"
+                    ></line>
+                    <line
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      x1="14.985"
+                      x2="14.985"
+                      y1="3"
+                      y2="21"
+                    ></line>
+                    <line
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      x1="21"
+                      x2="3"
+                      y1="9.015"
+                      y2="9.015"
+                    ></line>
+                    <line
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      x1="21"
+                      x2="3"
+                      y1="14.985"
+                      y2="14.985"
+                    ></line>
+                  </svg>
+                  <a className="inline-block py-3 pr-3 pl-2" href="#">
+                    <span className="hidden md:inline font-bold">Posts</span>
                   </a>
                 </li>
               </ul>

@@ -88,7 +88,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
   return (
     <>
       <div className="shadow-sm bg-white border-b sticky top-0 z-50">
-        <div className="flex justify-between items-center content-center max-w-[975px] pt-3 pb-3 lg:mx-auto mx-auto px-4">
+        <div className="flex justify-between items-center content-center max-w-[975px] pt-3 pb-3 mx-auto px-4">
           {/* Logo */}
           <Link href="/">
             <img
