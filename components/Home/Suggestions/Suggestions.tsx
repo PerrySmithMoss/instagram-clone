@@ -15,6 +15,7 @@ import { db } from "../../../firebase";
 import { useAuth } from "../../../context/AuthContext";
 import { useUserData } from "../../../context/UserContext";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 interface ISuggestionsProps {}
 
@@ -102,17 +103,21 @@ export const Suggestions: React.FC<ISuggestionsProps> = ({}) => {
               key={user.uid}
               className="flex items-center justify-between mt-3"
             >
-              <img
-                src={
-                  user.profilePicture
-                    ? user.profilePicture
-                    : "/assets/image/Navbar/default_profile_pic.jpeg"
-                }
-                alt="Suggestions Profile Picture"
-                className="rounded-full w-9 h-9"
-              />
+              <Link href={`/users/${user.uid}`}>
+                <img
+                  src={
+                    user.profilePicture
+                      ? user.profilePicture
+                      : "/assets/image/Navbar/default_profile_pic.jpeg"
+                  }
+                  alt="Suggestions Profile Picture"
+                  className="rounded-full w-9 h-9 cursor-pointer"
+                />
+              </Link>
               <div className="flex-1 ml-4">
-                <h2 className="font-semibold text-sm">{user.username}</h2>
+                <Link href={`/users/${user.uid}`}>
+                  <h2 className="font-semibold text-sm cursor-pointer">{user.username}</h2>
+                </Link>
                 <h3 className="text-xs text-gray-400">{user.fullName}</h3>
               </div>
               <button

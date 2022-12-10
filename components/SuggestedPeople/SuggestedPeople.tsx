@@ -9,6 +9,7 @@ import {
   arrayUnion,
   doc,
 } from "firebase/firestore";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useUserData } from "../../context/UserContext";
@@ -85,27 +86,34 @@ export const SuggestedPeople: React.FC<ISuggestedPeopleProps> = ({}) => {
             <div className="h-auto overflow-auto">
               <div className="flex flex-col relative">
                 {suggestions.map((suggestion: any) => (
-                  <div key={suggestion.uid} className="py-2 px-3 flex flex-row justify-start items-center relative">
-                    <img
-                      src={
-                        user.profilePicture
-                          ? user.profilePicture
-                          : "/assets/image/Navbar/default_profile_pic.jpeg"
-                      }
-                      alt="Suggestions Profile Picture"
-                      className="rounded-full w-10 h-10"
-                    />
+                  <div
+                    key={suggestion.uid}
+                    className="py-2 px-3 flex flex-row justify-start items-center relative"
+                  >
+                    <Link href={`/users/${suggestion.uid}`}>
+                      <img
+                        src={
+                          user.profilePicture
+                            ? user.profilePicture
+                            : "/assets/image/Navbar/default_profile_pic.jpeg"
+                        }
+                        alt="Suggestions Profile Picture"
+                        className="rounded-full w-10 h-10 cursor-pointer"
+                      />
+                    </Link>
                     <div className="flex-1 ml-4">
-                      <h2 className="font-semibold text-sm">
-                        {suggestion.username}
-                      </h2>
+                      <Link href={`/users/${suggestion.uid}`}>
+                        <h2 className="font-semibold cursor-pointer text-sm">
+                          {suggestion.username}
+                        </h2>
+                      </Link>
                       <h3 className="text-xs text-gray-400">
                         {suggestion.fullName}
                       </h3>
                     </div>
                     <button
                       onClick={() => handleFollowUser(suggestion.uid)}
-                      className="text-xs bg-blue-500 font-bold text-white px-4 py-2 rounded hover:bg-blue-600"
+                      className="text-xs bg-blue-500 cursor-pointer font-bold text-white px-4 py-2 rounded hover:bg-blue-600"
                     >
                       Follow
                     </button>
