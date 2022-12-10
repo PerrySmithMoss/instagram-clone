@@ -1,17 +1,6 @@
-import {
-  createUserWithEmailAndPassword,
-  FacebookAuthProvider,
-  GoogleAuthProvider,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  signOut,
-  updateProfile,
-} from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { createContext, useContext, useEffect, useState } from "react";
-import { auth, db } from "../firebase";
-import { User } from "../types/user";
+import { db } from "../firebase";
 import { useAuth } from "./AuthContext";
 
 const UserDataContext = createContext<any>({});
@@ -51,6 +40,7 @@ export const UserDataContextProvider = ({
     <UserDataContext.Provider
       value={{
         userData,
+        setUserData
       }}
     >
       {loading ? null : children}

@@ -20,7 +20,7 @@ interface ISuggestionsProps {}
 export const Suggestions: React.FC<ISuggestionsProps> = ({}) => {
   const [suggestions, setSuggestions] = useState<any>([]);
   const { user } = useAuth();
-  const { userData } = useUserData();
+  const { userData, setUserData } = useUserData();
 
   async function getUsers() {
     const doc = query(
@@ -55,8 +55,8 @@ export const Suggestions: React.FC<ISuggestionsProps> = ({}) => {
   async function updateFollowedUserFollowers(userFolllowedId: string) {
     await updateDoc(doc(db, "users", userFolllowedId), {
       followers: userData.following.includes(userFolllowedId)
-        ? arrayRemove(userFolllowedId)
-        : arrayUnion(userFolllowedId),
+        ? arrayRemove(user.uid)
+        : arrayUnion(user.uid),
     });
   }
 
@@ -64,11 +64,13 @@ export const Suggestions: React.FC<ISuggestionsProps> = ({}) => {
     await updateLoggedInUserFollowing(userId)
 
     await updateFollowedUserFollowers(userId)
+
+    setUserData((prev: any) => ({...prev, following: [...prev.following, userId]}))
   }
 
   useEffect(() => {
     getUsers();
-  }, []);
+  }, [userData]);
 
   return (
     <>

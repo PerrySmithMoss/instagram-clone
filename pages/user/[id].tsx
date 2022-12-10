@@ -176,7 +176,7 @@ const IndividualUser: NextPage = () => {
                   />
                   <div
                     style={{ transform: "translate(50%, 0%)" }}
-                    className=" cursor-pointer top-2 right-24 absolute rounded-full"
+                    className=" cursor-pointer top-2 right-20 absolute rounded-full"
                   >
                     <div
                       onClick={() => filePickerRef!.current!.click()}
