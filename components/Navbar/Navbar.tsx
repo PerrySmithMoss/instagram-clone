@@ -262,16 +262,16 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                               d="M19 10.5A8.5 8.5 0 1 1 10.5 2a8.5 8.5 0 0 1 8.5 8.5Z"
                               fill="none"
                               stroke="currentColor"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
                             ></path>
                             <line
                               fill="none"
                               stroke="currentColor"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
                               x1="16.511"
                               x2="22"
                               y1="16.511"
@@ -297,8 +297,8 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                               <line
                                 fill="none"
                                 stroke="currentColor"
-                                stroke-linejoin="round"
-                                stroke-width="2"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
                                 x1="22"
                                 x2="9.218"
                                 y1="3"
@@ -308,8 +308,8 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                                 fill="none"
                                 points="11.698 20.334 22 3.001 2 3.001 9.218 10.084 11.698 20.334"
                                 stroke="currentColor"
-                                stroke-linejoin="round"
-                                stroke-width="2"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
                               ></polygon>
                             </svg>
                           </div>
@@ -317,10 +317,9 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                         <hr />
                         <div
                           onClick={() => {
-                            setIsCreatePostModalOpen(!isCreatePostModalOpen)
-                            setIsMobileNavOpen(false)
-                          }
-                          }
+                            setIsCreatePostModalOpen(!isCreatePostModalOpen);
+                            setIsMobileNavOpen(false);
+                          }}
                           className="flex cursor-pointer justify-between content-center items-center w-full px-4 py-2 space-x-3 hover:bg-gray-50"
                         >
                           <button className="block text-gray-700 whitespace-no-wrap focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out">
@@ -339,16 +338,16 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                               d="M2 12v3.45c0 2.849.698 4.005 1.606 4.944.94.909 2.098 1.608 4.946 1.608h6.896c2.848 0 4.006-.7 4.946-1.608C21.302 19.455 22 18.3 22 15.45V8.552c0-2.849-.698-4.006-1.606-4.945C19.454 2.7 18.296 2 15.448 2H8.552c-2.848 0-4.006.699-4.946 1.607C2.698 4.547 2 5.703 2 8.552Z"
                               fill="none"
                               stroke="currentColor"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
                             ></path>
                             <line
                               fill="none"
                               stroke="currentColor"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
                               x1="6.545"
                               x2="17.455"
                               y1="12.001"
@@ -357,9 +356,9 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                             <line
                               fill="none"
                               stroke="currentColor"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
                               x1="12.003"
                               x2="12.003"
                               y1="6.545"
@@ -567,51 +566,50 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                       <div className="relative bg-white border border-gray-200 rounded-md shadow-xl w-52">
                         <div className="absolute top-0 right-12 w-4 h-4 origin-center transform rotate-45 translate-x-5 -translate-y-2 bg-white border-t border-l border-gray-200 rounded-sm pointer-events-none"></div>
                         <div className="relative">
-                          <div className="flex content-center items-center w-full px-4 py-2 space-x-3 hover:bg-gray-50">
-                            <svg
-                              aria-label="Profile"
-                              fill="#262626"
-                              color="#262626"
-                              height="17"
-                              viewBox="0 0 24 24"
-                              width="17"
-                            >
-                              <circle
-                                cx={12.004}
-                                cy={12.004}
-                                fill="none"
-                                strokeMiterlimit={10}
-                                strokeWidth={2}
-                                r={10.5}
-                                stroke="currentColor"
-                                strokeLinecap="round"
-                              ></circle>
-                              <path
-                                fill="none"
-                                d="M18.793 20.014a6.08 6.08 0 00-1.778-2.447 3.991 3.991 0 00-2.386-.791H9.38a3.994 3.994 0 00-2.386.791 6.09 6.09 0 00-1.779 2.447"
-                                strokeLinecap="round"
-                                stroke="currentColor"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                              />
-                              <circle
-                                cx={12.006}
-                                cy={9.718}
-                                fill="none"
-                                strokeMiterlimit={10}
-                                strokeWidth={2}
-                                r={4.19}
-                                stroke="currentColor"
-                                strokeLinecap="round"
-                              ></circle>
-                            </svg>
-                            <a
-                              href="#"
-                              className="block  text-sm text-gray-700 whitespace-no-wrap focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out"
-                            >
-                              Profile
-                            </a>
-                          </div>
+                          <Link href={`/user/${user.uid}`}>
+                            <div className="flex content-center items-center w-full px-4 py-2 space-x-3 hover:bg-gray-50">
+                              <svg
+                                aria-label="Profile"
+                                fill="#262626"
+                                color="#262626"
+                                height="17"
+                                viewBox="0 0 24 24"
+                                width="17"
+                              >
+                                <circle
+                                  cx={12.004}
+                                  cy={12.004}
+                                  fill="none"
+                                  strokeMiterlimit={10}
+                                  strokeWidth={2}
+                                  r={10.5}
+                                  stroke="currentColor"
+                                  strokeLinecap="round"
+                                ></circle>
+                                <path
+                                  fill="none"
+                                  d="M18.793 20.014a6.08 6.08 0 00-1.778-2.447 3.991 3.991 0 00-2.386-.791H9.38a3.994 3.994 0 00-2.386.791 6.09 6.09 0 00-1.779 2.447"
+                                  strokeLinecap="round"
+                                  stroke="currentColor"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                />
+                                <circle
+                                  cx={12.006}
+                                  cy={9.718}
+                                  fill="none"
+                                  strokeMiterlimit={10}
+                                  strokeWidth={2}
+                                  r={4.19}
+                                  stroke="currentColor"
+                                  strokeLinecap="round"
+                                ></circle>
+                              </svg>
+                              <a className="block  text-sm text-gray-700 whitespace-no-wrap focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out">
+                                Profile
+                              </a>
+                            </div>
+                          </Link>
                           <hr />
                           <button
                             onClick={() => logOut()}
