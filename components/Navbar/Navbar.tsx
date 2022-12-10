@@ -171,7 +171,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                                 className="block py-2 px-5 cursor-pointer hover:bg-gray-200"
                               >
                                 <div className="outline-none">
-                                  {/* <Link href={`/users/${user.id}`}> */}
+                                  {/* <Link href={`/user/${user.id}`}> */}
                                   <div className="flex flex-row justify-start items-center">
                                     <div>
                                       <img
