@@ -154,6 +154,7 @@ export const Profile: React.FC<IProfileProps> = ({}) => {
 
   useEffect(() => {
     getUser();
+    getUsersPosts()
   }, [router.query.id]);
 
   useEffect(() => {
