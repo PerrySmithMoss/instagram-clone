@@ -14,6 +14,7 @@ import {
 import { db } from "../../../firebase";
 import { useAuth } from "../../../context/AuthContext";
 import { useUserData } from "../../../context/UserContext";
+import { useRouter } from "next/router";
 
 interface ISuggestionsProps {}
 
@@ -21,6 +22,7 @@ export const Suggestions: React.FC<ISuggestionsProps> = ({}) => {
   const [suggestions, setSuggestions] = useState<any>([]);
   const { user } = useAuth();
   const { userData, setUserData } = useUserData();
+  const router = useRouter();
 
   async function getUsers() {
     const doc = query(
@@ -61,12 +63,15 @@ export const Suggestions: React.FC<ISuggestionsProps> = ({}) => {
   }
 
   const handleFollowUser = async (userId: string) => {
-    await updateLoggedInUserFollowing(userId)
+    await updateLoggedInUserFollowing(userId);
 
-    await updateFollowedUserFollowers(userId)
+    await updateFollowedUserFollowers(userId);
 
-    setUserData((prev: any) => ({...prev, following: [...prev.following, userId]}))
-  }
+    setUserData((prev: any) => ({
+      ...prev,
+      following: [...prev.following, userId],
+    }));
+  };
 
   useEffect(() => {
     getUsers();
@@ -77,9 +82,19 @@ export const Suggestions: React.FC<ISuggestionsProps> = ({}) => {
       {suggestions.length > 0 ? (
         <div className="mt-5 ml-10 w-full">
           <div className="flex justify-between text-sm mb-5">
-            <h3 className="text-sm font-medium text-gray-400">
-              Suggestions for you
-            </h3>
+            <div>
+              <h3 className="text-sm font-medium text-gray-400">
+                Suggestions for you
+              </h3>
+            </div>
+            <div>
+              <a
+                onClick={() => router.push("/suggested-people")}
+                className="text-xs text-blue-400 hover:text-blue-500 font-medium cursor-pointer"
+              >
+                See all
+              </a>
+            </div>
           </div>
 
           {suggestions.map((user: any) => (

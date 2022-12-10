@@ -21,9 +21,9 @@ export const MiniProfile: React.FC<IMiniProfileProps> = ({}) => {
       <div className="flex-1 mx-2">
         <h2 className="font-medium">{user.displayName}</h2>
       </div>
-      <div>
+      {/* <div>
         <button className="text-blue-400 text-sm font-semibold">Switch</button>
-      </div>
+      </div> */}
     </div>
   );
 };
