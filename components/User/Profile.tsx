@@ -371,10 +371,17 @@ sm:inline-block block"
                 </div>
 
                 <ul className="hidden md:flex space-x-8 mb-4">
-                  <li>
-                    <span className="font-semibold pr-1">136</span>
-                    posts
-                  </li>
+                  {posts.length === 1 ? (
+                    <li>
+                      <span className="font-semibold pr-1">{posts.length}</span>
+                      post
+                    </li>
+                  ) : (
+                    <li>
+                      <span className="font-semibold pr-1">{posts.length}</span>
+                      posts
+                    </li>
+                  )}
 
                   <li>
                     {user.followers.length === 1 ? (
@@ -511,9 +518,9 @@ sm:inline-block block"
                       y2="14.985"
                     ></line>
                   </svg>
-                  <a className="inline-block py-3 pr-3 pl-2" href="#">
+                  <div className="inline-block py-3 pr-3 pl-2">
                     <span className="hidden md:inline font-bold">Posts</span>
-                  </a>
+                  </div>
                 </li>
               </ul>
               <div className="flex flex-wrap -mx-px md:-mx-3">
