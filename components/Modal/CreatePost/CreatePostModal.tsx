@@ -15,6 +15,7 @@ import {
   ref as storageRef,
   uploadString,
 } from "firebase/storage";
+import { useUserData } from "../../../context/UserContext";
 
 // import { toast } from "react-toastify";
 
@@ -30,6 +31,8 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
   selector,
 }) => {
   const { user } = useAuth();
+  const { userData } = useUserData();
+
   const ref = useRef<any>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -61,8 +64,8 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
       const createPostRef = await addDoc(postsCollectionRef, {
         uid: user.uid,
-        username: user.username,
-        userAvatar: user.photoUrl,
+        username: user.displayName,
+        userAvatar: user.photoURL,
         caption: postCaption,
         location: postLocation,
         timestamp: serverTimestamp(),
@@ -84,18 +87,6 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
         console.error(error);
     }
   };
-
-  //   const showToastSuccess = () => {
-  //     toast.success("User avatar updated successfully", {
-  //       position: "top-right",
-  //       autoClose: 5000,
-  //       hideProgressBar: false,
-  //       closeOnClick: true,
-  //       pauseOnHover: true,
-  //       draggable: true,
-  //       progress: undefined,
-  //     });
-  //   };
 
   useEffect(() => {
     ref.current = document.querySelector(`#${selector}`);
@@ -215,14 +206,16 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                             className="rounded-full w-8 h-8"
                             alt="User's avatar"
                             src={
-                              (user?.photoUrl as string)
-                                ? (user?.photoUrl as string)
-                                : "/assets/image/Navbar/default_profile_pic.jpeg"
+                              user?.photoURL
+                              ? user?.photoURL
+                              : userData?.profilePicture
+                              ? userData?.profilePicture
+                              : "/assets/image/Navbar/default_profile_pic.jpeg"
                             }
                           />
                         </div>
                         <div className="flex-1 ml-2">
-                          <h2 className="font-medium">{user.username}</h2>
+                          <h2 className="font-medium">{user.displayName}</h2>
                         </div>
                       </div>
                       <div className="mt-4 ">

@@ -8,6 +8,7 @@ import { useOnClickOutside } from "../../hooks/useOnClickOustide";
 import { CreatePostModal } from "../Modal/CreatePost/CreatePostModal";
 import { RotatingLines } from "react-loader-spinner";
 import { useRouter } from "next/router";
+import { useUserData } from "../../context/UserContext";
 
 interface INavbarProps {}
 
@@ -24,6 +25,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
   const [searchResults, setSearchResults] = useState([]);
 
   const { user, logOut } = useAuth();
+  const { userData } = useUserData();
 
   const profileRef = useRef(null);
   useOnClickOutside(profileRef, () => setIsProfileOpen(false));
@@ -176,8 +178,10 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                                     <div>
                                       <img
                                         src={
-                                          (user?.photoUrl as string)
-                                            ? (user?.photoUrl as string)
+                                          user?.photoURL
+                                            ? user?.photoURL
+                                            : userData?.profilePicture
+                                            ? userData?.profilePicture
                                             : "/assets/image/Navbar/default_profile_pic.jpeg"
                                         }
                                         width={44}
@@ -399,9 +403,11 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                                 className="rounded-full"
                                 alt="Profile Picture"
                                 src={
-                                  (user?.photoUrl as string)
-                                    ? (user?.photoUrl as string)
-                                    : "/assets/image/Navbar/default_profile_pic.jpeg"
+                                  user?.photoURL
+                                  ? user?.photoURL
+                                  : userData?.profilePicture
+                                  ? userData?.profilePicture
+                                  : "/assets/image/Navbar/default_profile_pic.jpeg"
                                 }
                               />
                             </div>
@@ -549,12 +555,14 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                     className="flex w-9 h-9 justify-center items-center  mr-2 text-xl rounded-full text-white"
                   >
                     <img
-                      className="rounded-full"
+                      className="rounded-full w-9 h-9"
                       alt="Profile Picture"
                       src={
-                        (user?.photoUrl as string)
-                          ? (user?.photoUrl as string)
-                          : "/assets/image/Navbar/default_profile_pic.jpeg"
+                        user?.photoURL
+                        ? user?.photoURL
+                        : userData?.profilePicture
+                        ? userData?.profilePicture
+                        : "/assets/image/Navbar/default_profile_pic.jpeg"
                       }
                     />
                   </div>
