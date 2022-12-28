@@ -12,13 +12,13 @@ export const Feed: React.FC<IFeedProps> = ({}) => {
 
   return (
     <main
-      className={`grid grid-cols-1 md:grid-cols-2 md:max-w-[975px] lg:max-w-[975px] lg:grid-cols-7 mx-auto px-4 ${
+      className={`grid grid-cols-1 md:grid-cols-2 md:max-w-[975px] min-h-screen h-full lg:max-w-[975px] lg:grid-cols-7 mx-auto px-4 ${
         !user && "!grid-cols-1 !max-w-3xl"
       }`}
     >
       {/* Section left */}
       <section className="col-span-4">
-        <Stories />
+        {/* <Stories /> */}
         <Posts />
       </section>
       {/* Section Right */}

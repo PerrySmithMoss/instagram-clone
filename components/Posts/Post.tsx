@@ -190,7 +190,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
           <div className="flex items-center">
             <div>
               <img
-                className="rounded-full h-10 w-10 object-contain border mr-3"
+                className="rounded-full h-10 w-10 border mr-3"
                 src={
                   (post.userAvatar as string)
                     ? (post.userAvatar as string)
@@ -313,8 +313,8 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                   </svg>
                 </div>
               </div>
-              <div className="right">
-                <div className={`${styles.iconContainer} save cursor-pointer`}>
+              {/* <div>
+                <div className={`${styles.iconContainer} cursor-pointer`}>
                   <svg
                     aria-label="Save"
                     className="_8-yf5 "
@@ -326,7 +326,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                     <path d="M43.5 48c-.4 0-.8-.2-1.1-.4L24 29 5.6 47.6c-.4.4-1.1.6-1.6.3-.6-.2-1-.8-1-1.4v-45C3 .7 3.7 0 4.5 0h39c.8 0 1.5.7 1.5 1.5v45c0 .6-.4 1.2-.9 1.4-.2.1-.4.1-.6.1zM24 26c.8 0 1.6.3 2.2.9l15.8 16V3H6v39.9l15.8-16c.6-.6 1.4-.9 2.2-.9z"></path>
                   </svg>
                 </div>
-              </div>
+              </div> */}
             </div>
             <div className="mt-2">
               {likes.length === 1 ? (
