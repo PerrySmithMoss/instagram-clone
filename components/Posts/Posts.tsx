@@ -1,5 +1,13 @@
-import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import React, { useEffect, useState } from "react";
+import { useAuth } from "../../context/AuthContext";
+import { useUserData } from "../../context/UserContext";
 import { db } from "../../firebase";
 import { Post as IPost } from "../../types/post";
 import { Post } from "./Post";
@@ -7,24 +15,31 @@ import { Post } from "./Post";
 interface IPostsProps {}
 
 export const Posts: React.FC<IPostsProps> = ({}) => {
+  const { userData } = useUserData();
   const [posts, setPosts] = useState<any[]>([]);
 
   useEffect(() => {
-    const unSub = onSnapshot(
-      query(collection(db, "posts"), orderBy("timestamp", "desc")),
-      (querySnapshot) => {
-        const documents = querySnapshot.docs.map((doc: any) => {
-          return {
-            ...doc.data(),
-            id: doc.id,
-          };
-        });
-        setPosts(documents);
-      }
-    );
+    if (userData.following.length > 0) {
+      const unSub = onSnapshot(
+        query(
+          collection(db, "posts"),
+          where("uid", "in", userData.following),
+          orderBy("timestamp", "desc")
+        ),
+        (querySnapshot) => {
+          const documents = querySnapshot.docs.map((doc: any) => {
+            return {
+              ...doc.data(),
+              id: doc.id,
+            };
+          });
+          setPosts(documents);
+        }
+      );
 
-    return () => unSub();
-  }, [db]);
+      return () => unSub();
+    }
+  }, [userData, db]);
 
   return (
     <div>

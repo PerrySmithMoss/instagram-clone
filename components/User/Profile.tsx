@@ -171,6 +171,7 @@ export const Profile: React.FC<IProfileProps> = ({}) => {
     }
   }, [uploadedAvatar]);
 
+  console.log(posts);
   // Get user data from Firebase using userId from URL
   // if no userId then return page not found
   // if userId then display profile page
@@ -199,7 +200,7 @@ export const Profile: React.FC<IProfileProps> = ({}) => {
       </div>
     );
   }
-  if (foundUser) {
+  if (foundUser && posts) {
     return (
       <div className="bg-gray-50 h-screen">
         <Head>
