@@ -4,5 +4,5 @@ export interface User {
   password?: string;
   fullName:  string | null;
   username: string | null;
-  photoUrl: string | null
+  photoURL: string | null
 }

@@ -9,14 +9,14 @@ import React, { useEffect, useState } from "react";
 import { Oval } from "react-loader-spinner";
 import { useUserData } from "../../context/UserContext";
 import { db } from "../../firebase";
-import { Post as IPost } from "../../types/post";
+import { IPost } from "../../types/post";
 import { Post } from "./Post";
 
 interface IPostsProps {}
 
 export const Posts: React.FC<IPostsProps> = ({}) => {
   const { userData } = useUserData();
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<IPost[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -30,10 +30,20 @@ export const Posts: React.FC<IPostsProps> = ({}) => {
           orderBy("timestamp", "desc")
         ),
         (querySnapshot) => {
-          const documents = querySnapshot.docs.map((doc: any) => {
-            return {
+          const documents = querySnapshot.docs.map((doc) => {
+            const data: any = {
               ...doc.data(),
               id: doc.id,
+            };
+            return {
+              id: data.id,
+              caption: data.caption,
+              image: data.image,
+              location: data.location,
+              timestamp: data.timestamp,
+              uid: data.uid,
+              userAvatar: data.userAvatar,
+              username: data.username,
             };
           });
           setPosts(documents);
@@ -50,10 +60,20 @@ export const Posts: React.FC<IPostsProps> = ({}) => {
           orderBy("timestamp", "desc")
         ),
         (querySnapshot) => {
-          const documents = querySnapshot.docs.map((doc: any) => {
-            return {
+          const documents = querySnapshot.docs.map((doc) => {
+            const data: any = {
               ...doc.data(),
               id: doc.id,
+            };
+            return {
+              id: data.id,
+              caption: data.caption,
+              image: data.image,
+              location: data.location,
+              timestamp: data.timestamp,
+              uid: data.uid,
+              userAvatar: data.userAvatar,
+              username: data.username,
             };
           });
           setPosts(documents);

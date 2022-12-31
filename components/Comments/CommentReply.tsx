@@ -11,9 +11,11 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useAuth } from "../../context/AuthContext";
+import { IComment } from "../../types/comment";
+import { ILike } from "../../types/like";
 
 interface ICommentReplyProps {
-  comment: any;
+  comment: IComment;
   postId: string;
   originalCommentId: string;
 }
@@ -24,42 +26,46 @@ export const CommentReply: React.FC<ICommentReplyProps> = ({
   originalCommentId,
 }) => {
   const [hasLikedComment, setHasLikedComment] = useState(false);
-  const [likes, setLikes] = useState<any[]>([]);
+  const [likes, setLikes] = useState<ILike[]>([]);
   const { user } = useAuth();
 
   async function handleLikeComment() {
     if (hasLikedComment) {
-      await deleteDoc(
-        doc(
-          db,
-          "posts",
-          postId,
-          "comments",
-          originalCommentId,
-          "comments",
-          comment.id,
-          "likes",
-          user.uid
-        )
-      );
+      if (user) {
+        await deleteDoc(
+          doc(
+            db,
+            "posts",
+            postId,
+            "comments",
+            originalCommentId,
+            "comments",
+            comment.id,
+            "likes",
+            user.uid
+          )
+        );
+      }
     } else {
-      await setDoc(
-        doc(
-          db,
-          "posts",
-          postId,
-          "comments",
-          originalCommentId,
-          "comments",
-          comment.id,
-          "likes",
-          user.uid
-        ),
-        {
-          username: user?.username,
-          userAvatar: user?.photoUrl,
-        }
-      );
+      if (user) {
+        await setDoc(
+          doc(
+            db,
+            "posts",
+            postId,
+            "comments",
+            originalCommentId,
+            "comments",
+            comment.id,
+            "likes",
+            user.uid
+          ),
+          {
+            username: user?.displayName,
+            userAvatar: user?.photoURL,
+          }
+        );
+      }
     }
   }
 
@@ -73,9 +79,14 @@ export const CommentReply: React.FC<ICommentReplyProps> = ({
       ),
       (querySnapshot) => {
         const documents = querySnapshot.docs.map((doc) => {
-          return {
+          const data: any = {
             ...doc.data(),
             id: doc.id,
+          };
+          return {
+            username: data.username,
+            userAvatar: data.userAvatar,
+            id: data.id,
           };
         });
         setLikes(documents);
@@ -88,7 +99,7 @@ export const CommentReply: React.FC<ICommentReplyProps> = ({
   useEffect(
     () =>
       setHasLikedComment(
-        likes.findIndex((like: any) => like.id === user?.uid) !== -1
+        likes.findIndex((like) => like.id === user?.uid) !== -1
       ),
     [likes]
   );

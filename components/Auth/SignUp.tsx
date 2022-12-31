@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 interface ISignUpProps {}
 
 export const SignUp: React.FC<ISignUpProps> = () => {
-  const { user, signUp, signUpWithGoogle, signUpWithFacebook } = useAuth();
+  const { signUp, signUpWithGoogle, signUpWithFacebook } = useAuth();
   const [userInputDetails, setUserInputDetails] = useState({
     email: "",
     fullName: "",

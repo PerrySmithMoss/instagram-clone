@@ -1,6 +1,7 @@
 import {
   addDoc,
   collection,
+  CollectionReference,
   deleteDoc,
   doc,
   onSnapshot,
@@ -14,7 +15,9 @@ import React, { useEffect, useRef, useState } from "react";
 import TimeAgo from "react-timeago";
 import { useAuth } from "../../context/AuthContext";
 import { db } from "../../firebase";
-import { Post as IPost } from "../../types/post";
+import { IComment } from "../../types/comment";
+import { ILike } from "../../types/like";
+import { IPost } from "../../types/post";
 import { Comment } from "../Comments/Comment";
 import { CommentUnderPost } from "../Comments/CommentUnderPost";
 import { ViewPostModal } from "../Modal/ViewPost/ViewPostModal";
@@ -32,12 +35,12 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
 
   const [comment, setComment] = useState("");
   const [modalComment, setModalComment] = useState("");
-  const [comments, setComments] = useState<any[]>([]);
+  const [comments, setComments] = useState<IComment[]>([]);
 
   const [isReply, setIsReply] = useState(false);
   const [replyToCommentId, setReplyToCommentId] = useState("");
 
-  const [likes, setLikes] = useState<any[]>([]);
+  const [likes, setLikes] = useState<ILike[]>([]);
   const [hasLikedPost, setHasLikedPost] = useState(false);
 
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
@@ -63,9 +66,9 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
 
     await addDoc(collection(db, "posts", post.id, "comments"), {
       comment: commentToSend,
-      uid: user.uid,
-      username: user.username,
-      userAvatar: user.photoUrl,
+      uid: user?.uid,
+      username: user?.displayName,
+      userAvatar: user?.photoURL,
       timestamp: serverTimestamp(),
     });
   };
@@ -95,18 +98,18 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
         ),
         {
           comment: commentToSend,
-          uid: user.uid,
-          username: user.username,
-          userAvatar: user.photoUrl,
+          uid: user?.uid,
+          username: user?.displayName,
+          userAvatar: user?.photoURL,
           timestamp: serverTimestamp(),
         }
       );
     } else {
       await addDoc(collection(db, "posts", post.id, "comments"), {
         comment: commentToSend,
-        uid: user.uid,
-        username: user.username,
-        userAvatar: user.photoUrl,
+        uid: user?.uid,
+        username: user?.displayName,
+        userAvatar: user?.photoURL,
         timestamp: serverTimestamp(),
       });
     }
@@ -122,12 +125,16 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
 
   async function likePost() {
     if (hasLikedPost) {
-      await deleteDoc(doc(db, "posts", post.id, "likes", user.uid));
+      if (user) {
+        await deleteDoc(doc(db, "posts", post.id, "likes", user.uid));
+      }
     } else {
-      await setDoc(doc(db, "posts", post.id, "likes", user.uid), {
-        username: user?.username,
-        userAvatar: user?.photoUrl,
-      });
+      if (user) {
+        await setDoc(doc(db, "posts", post.id, "likes", user.uid), {
+          username: user?.displayName,
+          userAvatar: user?.photoURL,
+        });
+      }
     }
   }
 
@@ -146,9 +153,17 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
       ),
       (querySnapshot) => {
         const documents = querySnapshot.docs.map((doc) => {
-          return {
+          const data: any = {
             ...doc.data(),
             id: doc.id,
+          };
+          return {
+            comment: data.comment,
+            id: data.id,
+            timestamp: data.timestamp,
+            uid: data.uid,
+            userAvatar: data.userAvatar,
+            username: data.username,
           };
         });
         setComments(documents);
@@ -163,9 +178,14 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
       query(collection(db, "posts", post.id, "likes")),
       (querySnapshot) => {
         const documents = querySnapshot.docs.map((doc) => {
-          return {
+          const data: any = {
             ...doc.data(),
             id: doc.id,
+          };
+          return {
+            username: data.username,
+            userAvatar: data.userAvatar,
+            id: data.id,
           };
         });
         setLikes(documents);
@@ -177,9 +197,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
 
   useEffect(
     () =>
-      setHasLikedPost(
-        likes.findIndex((like: any) => like.id === user?.uid) !== -1
-      ),
+      setHasLikedPost(likes.findIndex((like) => like.id === user?.uid) !== -1),
     [likes]
   );
 
@@ -353,7 +371,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                 {comments
                   .slice(0, 2)
                   .reverse()
-                  .map((comment: any) => (
+                  .map((comment) => (
                     <CommentUnderPost
                       key={comment.id}
                       comment={comment}
@@ -366,7 +384,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                 {comments
                   .slice(0, 2)
                   .reverse()
-                  .map((comment: any) => (
+                  .map((comment) => (
                     <CommentUnderPost
                       key={comment.id}
                       comment={comment}
@@ -591,8 +609,6 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                       </div>
                       <div>
                         <p className="text-sm text-gray-800">
-                          Liked by <b className="text-black">{user.username}</b>{" "}
-                          and{" "}
                           {likes.length === 1 || likes.length === 2 ? (
                             <b className="text-black">{likes.length} other</b>
                           ) : (
@@ -677,7 +693,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                           {comments
                             .slice(0, visableComments)
                             // .reverse()
-                            .map((comment: any) => (
+                            .map((comment) => (
                               <Comment
                                 key={comment.id}
                                 postId={post.id}
@@ -744,7 +760,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                         <div>
                           {comments
                             // .reverse()
-                            .map((comment: any) => (
+                            .map((comment) => (
                               <Comment
                                 key={comment.id}
                                 postId={post.id}

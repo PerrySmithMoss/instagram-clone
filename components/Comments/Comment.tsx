@@ -12,12 +12,14 @@ import { db } from "../../firebase";
 import styles from "./Comments.module.css";
 import TimeAgo from "react-timeago";
 import { CommentReply } from "./CommentReply";
+import { IComment } from "../../types/comment";
+import { ILike } from "../../types/like";
 
 interface ICommentProps {
   postId: string;
-  comment: any;
+  comment: IComment;
   commentInputRef: React.MutableRefObject<HTMLInputElement | null>;
-  setModalComment: any;
+  setModalComment: (value: string) => void;
   setIsReply: React.Dispatch<React.SetStateAction<boolean>>;
   setReplyToCommentId: React.Dispatch<React.SetStateAction<string>>;
 }
@@ -31,24 +33,28 @@ export const Comment: React.FC<ICommentProps> = ({
   setReplyToCommentId,
 }) => {
   const { user } = useAuth();
-  const [likes, setLikes] = useState<any[]>([]);
-  const [commentReplies, setCommentReplies] = useState<any[]>([]);
+  const [likes, setLikes] = useState<ILike[]>([]);
+  const [commentReplies, setCommentReplies] = useState<IComment[]>([]);
   const [showComments, setShowComments] = useState(false);
   const [hasLikedComment, setHasLikedComment] = useState(false);
 
   async function handleLikeComment() {
     if (hasLikedComment) {
-      await deleteDoc(
-        doc(db, "posts", postId, "comments", comment.id, "likes", user.uid)
-      );
+      if (user) {
+        await deleteDoc(
+          doc(db, "posts", postId, "comments", comment.id, "likes", user.uid)
+        );
+      }
     } else {
-      await setDoc(
-        doc(db, "posts", postId, "comments", comment.id, "likes", user.uid),
-        {
-          username: user?.username,
-          userAvatar: user?.photoUrl,
-        }
-      );
+      if (user) {
+        await setDoc(
+          doc(db, "posts", postId, "comments", comment.id, "likes", user.uid),
+          {
+            username: user?.displayName,
+            userAvatar: user?.photoURL,
+          }
+        );
+      }
     }
   }
 
@@ -67,9 +73,14 @@ export const Comment: React.FC<ICommentProps> = ({
       query(collection(db, `/posts/${postId}/comments/${comment.id}/likes`)),
       (querySnapshot) => {
         const documents = querySnapshot.docs.map((doc) => {
-          return {
+          const data: any = {
             ...doc.data(),
             id: doc.id,
+          };
+          return {
+            username: data.username,
+            userAvatar: data.userAvatar,
+            id: data.id,
           };
         });
         setLikes(documents);
@@ -84,9 +95,17 @@ export const Comment: React.FC<ICommentProps> = ({
       query(collection(db, `/posts/${postId}/comments/${comment.id}/comments`)),
       (querySnapshot) => {
         const documents = querySnapshot.docs.map((doc) => {
-          return {
+          const data: any = {
             ...doc.data(),
             id: doc.id,
+          };
+          return {
+            comment: data.comment,
+            id: data.id,
+            timestamp: data.timestamp,
+            uid: data.uid,
+            userAvatar: data.userAvatar,
+            username: data.username,
           };
         });
         setCommentReplies(documents);
@@ -99,7 +118,7 @@ export const Comment: React.FC<ICommentProps> = ({
   useEffect(
     () =>
       setHasLikedComment(
-        likes.findIndex((like: any) => like.id === user?.uid) !== -1
+        likes.findIndex((like) => like.id === user?.uid) !== -1
       ),
     [likes]
   );

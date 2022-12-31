@@ -24,6 +24,8 @@ import { Post } from "../../components/User/Post";
 import { useAuth } from "../../context/AuthContext";
 import { useUserData } from "../../context/UserContext";
 import { db, storage } from "../../firebase";
+import { IPost } from "../../types/post";
+import { IUserData } from "../../types/userData";
 
 interface IProfileProps {}
 
@@ -31,12 +33,12 @@ export const Profile: React.FC<IProfileProps> = ({}) => {
   const { user: currentUser } = useAuth();
   const { userData, setUserData } = useUserData();
 
-  const [user, setUser] = useState<any>();
+  const [user, setUser] = useState<IUserData>();
   const [foundUser, setFoundUser] = useState(false);
   const [loading, setLoading] = useState(true);
   const [uploadedAvatar, setUploadedAvater] = useState(false);
 
-  const [posts, setPosts] = useState<any>();
+  const [posts, setPosts] = useState<IPost[]>();
   const router = useRouter();
 
   const filePickerRef = useRef<HTMLInputElement>(null);
@@ -50,26 +52,28 @@ export const Profile: React.FC<IProfileProps> = ({}) => {
 
     reader.onload = async (readerEvent) => {
       try {
-        const imageRef = storageRef(
-          storage,
-          `avatars/${currentUser.uid}/image`
-        );
+        if (currentUser) {
+          const imageRef = storageRef(
+            storage,
+            `avatars/${currentUser.uid}/image`
+          );
 
-        await uploadString(
-          imageRef,
-          readerEvent.target?.result as string,
-          "data_url"
-        );
+          await uploadString(
+            imageRef,
+            readerEvent.target?.result as string,
+            "data_url"
+          );
 
-        const downloadUrl = await getDownloadURL(imageRef);
+          const downloadUrl = await getDownloadURL(imageRef);
 
-        await updateProfile(currentUser, { photoURL: downloadUrl });
+          await updateProfile(currentUser, { photoURL: downloadUrl });
 
-        await updateDoc(doc(db, "users", currentUser.uid), {
-          profilePicture: downloadUrl,
-        }).then((_doc) => {
-          setUploadedAvater(true);
-        });
+          await updateDoc(doc(db, "users", currentUser.uid), {
+            profilePicture: downloadUrl,
+          }).then((_doc) => {
+            setUploadedAvater(true);
+          });
+        }
       } catch (error: any) {
         console.error(error);
       }
@@ -83,7 +87,20 @@ export const Profile: React.FC<IProfileProps> = ({}) => {
 
     if (docSnap.exists()) {
       const data = docSnap.data();
-      setUser(data);
+
+      const user = {
+        id: data.id,
+        displayName: data.displayName,
+        email: data.email,
+        followers: data.followers,
+        following: data.following,
+        fullName: data.fullName,
+        profilePicture: data.profilePicture,
+        uid: data.uid,
+        username: data.username,
+      };
+
+      setUser(user);
       setFoundUser(true);
       setLoading(false);
     } else {
@@ -99,10 +116,20 @@ export const Profile: React.FC<IProfileProps> = ({}) => {
     const unSub = onSnapshot(
       query(collection(db, "posts"), where("uid", "==", router.query.id)),
       (querySnapshot) => {
-        const documents = querySnapshot.docs.map((doc: any) => {
-          return {
+        const documents = querySnapshot.docs.map((doc) => {
+          const data: any = {
             ...doc.data(),
             id: doc.id,
+          };
+          return {
+            id: data.id,
+            caption: data.caption,
+            image: data.image,
+            location: data.location,
+            timestamp: data.timestamp,
+            uid: data.uid,
+            userAvatar: data.userAvatar,
+            username: data.username,
           };
         });
         setPosts(documents);
@@ -113,19 +140,23 @@ export const Profile: React.FC<IProfileProps> = ({}) => {
   }
 
   async function updateLoggedInUserFollowing(userToFolllowId: string) {
-    await updateDoc(doc(db, "users", currentUser.uid), {
-      following: userData.following.includes(userToFolllowId)
-        ? arrayRemove(userToFolllowId)
-        : arrayUnion(userToFolllowId),
-    });
+    if (currentUser) {
+      await updateDoc(doc(db, "users", currentUser.uid), {
+        following: userData.following.includes(userToFolllowId)
+          ? arrayRemove(userToFolllowId)
+          : arrayUnion(userToFolllowId),
+      });
+    }
   }
 
   async function updateFollowedUserFollowers(userFolllowedId: string) {
-    await updateDoc(doc(db, "users", userFolllowedId), {
-      followers: userData.following.includes(userFolllowedId)
-        ? arrayRemove(currentUser.uid)
-        : arrayUnion(currentUser.uid),
-    });
+    if (currentUser) {
+      await updateDoc(doc(db, "users", userFolllowedId), {
+        followers: userData.following.includes(userFolllowedId)
+          ? arrayRemove(currentUser.uid)
+          : arrayUnion(currentUser.uid),
+      });
+    }
   }
 
   const handleFollowUser = async (userId: string) => {
@@ -135,21 +166,25 @@ export const Profile: React.FC<IProfileProps> = ({}) => {
 
     const isFollowingUser = userData.following.includes(userId);
 
-    setUser((prev: any) => ({
-      ...prev,
-      followers: isFollowingUser
-        ? prev.followers.filter(
-            (followingId: string) => followingId !== currentUser.uid
-          )
-        : [...prev.followers, currentUser.uid],
-    }));
+    if (currentUser) {
+      setUserData((prev) => ({
+        ...prev,
+        followers: isFollowingUser
+          ? prev.followers.filter(
+              (followingId: string) => followingId !== currentUser.uid
+            )
+          : [...prev.followers, currentUser.uid],
+      }));
 
-    setUserData((prev: any) => ({
-      ...prev,
-      following: isFollowingUser
-        ? prev.following.filter((followingId: string) => followingId !== userId)
-        : [...prev.following, userId],
-    }));
+      setUserData((prev) => ({
+        ...prev,
+        following: isFollowingUser
+          ? prev.following.filter(
+              (followingId: string) => followingId !== userId
+            )
+          : [...prev.following, userId],
+      }));
+    }
   };
 
   useEffect(() => {
@@ -199,7 +234,7 @@ export const Profile: React.FC<IProfileProps> = ({}) => {
       </div>
     );
   }
-  if (foundUser && posts) {
+  if (foundUser && posts && router.query.id && user && currentUser) {
     return (
       <div className="bg-gray-50 h-screen">
         <Head>
@@ -333,7 +368,9 @@ export const Profile: React.FC<IProfileProps> = ({}) => {
                   ) : (
                     <div className="xs:ml-6 mt-1 xs:mt-0 flex items-center space-x-2">
                       <div>
-                        {userData.following.includes(router.query.id) ? (
+                        {userData.following.includes(
+                          router.query.id as string
+                        ) ? (
                           <button
                             onClick={() =>
                               handleFollowUser(router.query.id as string)
@@ -526,7 +563,7 @@ sm:inline-block block"
               <div className="flex flex-wrap -mx-px md:-mx-3">
                 {posts &&
                   posts.length > 0 &&
-                  posts.map((post: any) => <Post key={post.id} post={post} />)}
+                  posts.map((post) => <Post key={post.id} post={post} />)}
               </div>
             </div>
           </div>

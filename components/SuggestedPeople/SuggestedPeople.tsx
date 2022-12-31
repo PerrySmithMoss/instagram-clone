@@ -14,20 +14,21 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useUserData } from "../../context/UserContext";
 import { db } from "../../firebase";
+import { IUserData } from "../../types/userData";
 
 interface ISuggestedPeopleProps {}
 
 export const SuggestedPeople: React.FC<ISuggestedPeopleProps> = ({}) => {
   const { user } = useAuth();
-  const [suggestions, setSuggestions] = useState<any>([]);
+  const [suggestions, setSuggestions] = useState<IUserData[]>([]);
   const { userData, setUserData } = useUserData();
 
   async function getUsers() {
     const doc = query(
       collection(db, "users"),
       userData.following.length > 0
-        ? where("uid", "not-in", [...userData.following, user.uid])
-        : where("uid", "!=", user.uid),
+        ? where("uid", "not-in", [...userData.following, user?.uid])
+        : where("uid", "!=", user?.uid),
       limit(20)
     );
 
@@ -45,19 +46,23 @@ export const SuggestedPeople: React.FC<ISuggestedPeopleProps> = ({}) => {
   }
 
   async function updateLoggedInUserFollowing(userToFolllowId: string) {
-    await updateDoc(doc(db, "users", user.uid), {
-      following: userData.following.includes(userToFolllowId)
-        ? arrayRemove(userToFolllowId)
-        : arrayUnion(userToFolllowId),
-    });
+    if (user) {
+      await updateDoc(doc(db, "users", user.uid), {
+        following: userData.following.includes(userToFolllowId)
+          ? arrayRemove(userToFolllowId)
+          : arrayUnion(userToFolllowId),
+      });
+    }
   }
 
   async function updateFollowedUserFollowers(userFolllowedId: string) {
-    await updateDoc(doc(db, "users", userFolllowedId), {
-      followers: userData.following.includes(userFolllowedId)
-        ? arrayRemove(user.uid)
-        : arrayUnion(user.uid),
-    });
+    if (user) {
+      await updateDoc(doc(db, "users", userFolllowedId), {
+        followers: userData.following.includes(userFolllowedId)
+          ? arrayRemove(user.uid)
+          : arrayUnion(user.uid),
+      });
+    }
   }
 
   const handleFollowUser = async (userId: string) => {
@@ -65,7 +70,7 @@ export const SuggestedPeople: React.FC<ISuggestedPeopleProps> = ({}) => {
 
     await updateFollowedUserFollowers(userId);
 
-    setUserData((prev: any) => ({
+    setUserData((prev: IUserData) => ({
       ...prev,
       following: [...prev.following, userId],
     }));
@@ -85,7 +90,7 @@ export const SuggestedPeople: React.FC<ISuggestedPeopleProps> = ({}) => {
           <div className="py-1 flex flex-col items-stretch content-center justify-start relative bg-white">
             <div className="h-auto overflow-auto">
               <div className="flex flex-col relative">
-                {suggestions.map((suggestion: any) => (
+                {suggestions.map((suggestion) => (
                   <div
                     key={suggestion.uid}
                     className="py-2 px-3 flex flex-row justify-start items-center relative"
@@ -93,8 +98,8 @@ export const SuggestedPeople: React.FC<ISuggestedPeopleProps> = ({}) => {
                     <Link href={`/user/${suggestion.uid}`}>
                       <img
                         src={
-                          user.profilePicture
-                            ? user.profilePicture
+                          suggestion?.profilePicture
+                            ? suggestion?.profilePicture
                             : "/assets/image/Navbar/default_profile_pic.jpeg"
                         }
                         alt="Suggestions Profile Picture"

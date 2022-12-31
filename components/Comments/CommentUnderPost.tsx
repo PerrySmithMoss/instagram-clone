@@ -9,10 +9,12 @@ import {
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { db } from "../../firebase";
+import { IComment } from "../../types/comment";
+import { ILike } from "../../types/like";
 import styles from "./Comments.module.css";
 
 interface ICommentUnderPostProps {
-  comment: any;
+  comment: IComment;
   postId: string;
 }
 
@@ -21,22 +23,26 @@ export const CommentUnderPost: React.FC<ICommentUnderPostProps> = ({
   postId,
 }) => {
   const { user } = useAuth();
-  const [likes, setLikes] = useState<any[]>([]);
+  const [likes, setLikes] = useState<ILike[]>([]);
   const [hasLikedComment, setHasLikedComment] = useState(false);
 
   async function handleLikeComment() {
     if (hasLikedComment) {
-      await deleteDoc(
-        doc(db, "posts", postId, "comments", comment.id, "likes", user.uid)
-      );
+      if (user) {
+        await deleteDoc(
+          doc(db, "posts", postId, "comments", comment.id, "likes", user.uid)
+        );
+      }
     } else {
-      await setDoc(
-        doc(db, "posts", postId, "comments", comment.id, "likes", user.uid),
-        {
-          username: user?.username,
-          userAvatar: user?.photoUrl,
-        }
-      );
+      if (user) {
+        await setDoc(
+          doc(db, "posts", postId, "comments", comment.id, "likes", user.uid),
+          {
+            username: user?.displayName,
+            userAvatar: user?.photoURL,
+          }
+        );
+      }
     }
   }
 
@@ -45,9 +51,14 @@ export const CommentUnderPost: React.FC<ICommentUnderPostProps> = ({
       query(collection(db, `/posts/${postId}/comments/${comment.id}/likes`)),
       (querySnapshot) => {
         const documents = querySnapshot.docs.map((doc) => {
-          return {
+          const data: any = {
             ...doc.data(),
             id: doc.id,
+          };
+          return {
+            username: data.username,
+            userAvatar: data.userAvatar,
+            id: data.id,
           };
         });
         setLikes(documents);
@@ -60,7 +71,7 @@ export const CommentUnderPost: React.FC<ICommentUnderPostProps> = ({
   useEffect(
     () =>
       setHasLikedComment(
-        likes.findIndex((like: any) => like.id === user?.uid) !== -1
+        likes.findIndex((like) => like.id === user?.uid) !== -1
       ),
     [likes]
   );

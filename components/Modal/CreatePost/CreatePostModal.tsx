@@ -63,9 +63,9 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
       const postsCollectionRef = collection(db, "posts");
 
       const createPostRef = await addDoc(postsCollectionRef, {
-        uid: user.uid,
-        username: user.displayName,
-        userAvatar: user.photoURL,
+        uid: user?.uid,
+        username: user?.displayName,
+        userAvatar: user?.photoURL,
         caption: postCaption,
         location: postLocation,
         timestamp: serverTimestamp(),
@@ -215,7 +215,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                           />
                         </div>
                         <div className="flex-1 ml-2">
-                          <h2 className="font-medium">{user.displayName}</h2>
+                          <h2 className="font-medium">{user?.displayName}</h2>
                         </div>
                       </div>
                       <div className="mt-4 ">

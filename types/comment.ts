@@ -1,10 +1,8 @@
 import { Timestamp } from "firebase/firestore";
 
-export interface IPost {
-  id: string
-  caption: string;
-  image: string;
-  location: string;
+export interface IComment {
+  comment: string;
+  id: string;
   timestamp: Timestamp;
   uid: string;
   userAvatar: string;

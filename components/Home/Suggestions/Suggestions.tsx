@@ -16,50 +16,55 @@ import { useAuth } from "../../../context/AuthContext";
 import { useUserData } from "../../../context/UserContext";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { IUserData } from "../../../types/userData";
 
 interface ISuggestionsProps {}
 
 export const Suggestions: React.FC<ISuggestionsProps> = ({}) => {
-  const [suggestions, setSuggestions] = useState<any>([]);
+  const [suggestions, setSuggestions] = useState<IUserData[]>([]);
   const { user } = useAuth();
   const { userData, setUserData } = useUserData();
   const router = useRouter();
 
   async function getUsers() {
-    const doc = query(
-      collection(db, "users"),
-      userData.following.length > 0
-        ? where("uid", "not-in", [...userData.following, user.uid])
-        : where("uid", "!=", user.uid),
-      limit(5)
-    );
+    if (user) {
+      const doc = query(
+        collection(db, "users"),
+        userData.following.length > 0
+          ? where("uid", "not-in", [...userData.following, user.uid])
+          : where("uid", "!=", user.uid),
+        limit(5)
+      );
 
-    getDocs(doc).then((querySnapshot) => {
-      let values: any = [];
-      querySnapshot.forEach((doc) => {
-        let data = {
-          ...doc.data(),
-          id: doc.id,
-        };
-        values.push(data);
+      getDocs(doc).then((querySnapshot) => {
+        let values: any = [];
+        querySnapshot.forEach((doc) => {
+          let data = {
+            ...doc.data(),
+            id: doc.id,
+          };
+          values.push(data);
+        });
+        setSuggestions(values);
       });
-      setSuggestions(values);
-    });
+    }
   }
 
   async function updateLoggedInUserFollowing(userToFolllowId: string) {
-    await updateDoc(doc(db, "users", user.uid), {
-      following: userData.following.includes(userToFolllowId)
-        ? arrayRemove(userToFolllowId)
-        : arrayUnion(userToFolllowId),
-    });
+    if (user) {
+      await updateDoc(doc(db, "users", user?.uid), {
+        following: userData.following.includes(userToFolllowId)
+          ? arrayRemove(userToFolllowId)
+          : arrayUnion(userToFolllowId),
+      });
+    }
   }
 
   async function updateFollowedUserFollowers(userFolllowedId: string) {
     await updateDoc(doc(db, "users", userFolllowedId), {
       followers: userData.following.includes(userFolllowedId)
-        ? arrayRemove(user.uid)
-        : arrayUnion(user.uid),
+        ? arrayRemove(user?.uid)
+        : arrayUnion(user?.uid),
     });
   }
 
@@ -68,7 +73,7 @@ export const Suggestions: React.FC<ISuggestionsProps> = ({}) => {
 
     await updateFollowedUserFollowers(userId);
 
-    setUserData((prev: any) => ({
+    setUserData((prev) => ({
       ...prev,
       following: [...prev.following, userId],
     }));
@@ -98,7 +103,7 @@ export const Suggestions: React.FC<ISuggestionsProps> = ({}) => {
             </div>
           </div>
 
-          {suggestions.map((user: any) => (
+          {suggestions.map((user) => (
             <div
               key={user.uid}
               className="flex items-center justify-between mt-3"
@@ -116,7 +121,9 @@ export const Suggestions: React.FC<ISuggestionsProps> = ({}) => {
               </Link>
               <div className="flex-1 ml-4">
                 <Link href={`/user/${user.uid}`}>
-                  <h2 className="font-semibold text-sm cursor-pointer">{user.username}</h2>
+                  <h2 className="font-semibold text-sm cursor-pointer">
+                    {user.username}
+                  </h2>
                 </Link>
                 <h3 className="text-xs text-gray-400">{user.fullName}</h3>
               </div>

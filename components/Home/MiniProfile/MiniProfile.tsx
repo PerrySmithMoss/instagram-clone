@@ -12,7 +12,7 @@ export const MiniProfile: React.FC<IMiniProfileProps> = ({}) => {
   return (
     <div className="flex items-center justify-between mt-5 ml-10 w-full">
       <div>
-        <Link href={`/user/${user.uid}`}>
+        <Link href={`/user/${user?.uid}`}>
           <img
             className="rounded-full cursor-pointer w-12 h-12"
             alt="Profile Picture"
@@ -26,9 +26,9 @@ export const MiniProfile: React.FC<IMiniProfileProps> = ({}) => {
           />
         </Link>
       </div>
-      <Link href={`/user/${user.uid}`}>
+      <Link href={`/user/${user?.uid}`}>
         <div className="flex-1 mx-2 cursor-pointer">
-          <h2 className="font-medium">{user.displayName}</h2>
+          <h2 className="font-medium">{user?.displayName}</h2>
         </div>
       </Link>
     </div>

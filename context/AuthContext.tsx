@@ -7,23 +7,53 @@ import {
   signInWithPopup,
   signOut,
   updateProfile,
+  User,
+  UserCredential,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth, db } from "../firebase";
-import { User } from "../types/user";
 
-const AuthContext = createContext<any>({});
+interface IUserDetails {
+  email: string;
+  fullName: string;
+  username: string;
+  password: string;
+}
+interface IAuthContext {
+  user: User | null;
+  signUp: (userDetails: IUserDetails) => Promise<
+    | {
+        error: boolean;
+        messsge: string;
+        action: string;
+        message?: undefined;
+      }
+    | {
+        error: boolean;
+        message: any;
+        action: any;
+        messsge?: undefined;
+      }
+  >;
+  logInWithEmailAndPassword: (
+    email: string,
+    password: string
+  ) => Promise<UserCredential>;
+  logOut: () => Promise<void>;
+  signUpWithGoogle: () => Promise<void>;
+  signUpWithFacebook: () => Promise<void>;
+}
+
+const AuthContext = createContext<IAuthContext>({} as IAuthContext);
 
 export const AuthContextProvider = ({
   children,
 }: {
   children: React.ReactNode;
-}) => {
-  const [user, setUser] = useState<any>(null);
+}): JSX.Element => {
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-
-  // console.log("User Context: ", user);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -38,7 +68,7 @@ export const AuthContextProvider = ({
     return () => unsubscribe();
   }, []);
 
-  const signUp = async (userDetails: User) => {
+  const signUp = async (userDetails: IUserDetails) => {
     try {
       const res = await createUserWithEmailAndPassword(
         auth,
@@ -58,7 +88,7 @@ export const AuthContextProvider = ({
           profilePicture: null,
           fullName: userDetails.fullName,
           username: userDetails.username,
-          following: ["9apvkdI9ZhSm8Ot1NignmKlicR93"],
+          following: ["9apvkdI9ZhSm8Ot1NignmKlicR93"], // so user's have default posts on their feed. User can unfollow at anmy time.
           followers: [],
         });
 
