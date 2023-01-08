@@ -7,7 +7,6 @@ import useDebounce from "../../hooks/useDebounce";
 import { useOnClickOutside } from "../../hooks/useOnClickOustide";
 import { CreatePostModal } from "../Modal/CreatePost/CreatePostModal";
 import { RotatingLines } from "react-loader-spinner";
-import { useRouter } from "next/router";
 import { useUserData } from "../../context/UserContext";
 import { IUserData } from "../../types/userData";
 
@@ -98,129 +97,128 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
               className="cursor-pointer"
             />
           </Link>
-          {/* Search */}
-          <div className="hidden flex-1 md:flex items-center justify-center px-16 lg:ml-12">
-            <div className="max-w-lg w-full lg:max-w-xs relative">
-              <label htmlFor="search" className="sr-only">
-                Search
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg
-                    className="h-5 w-5 text-gray-400"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <input
-                  id="search"
-                  name="search"
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  className="block w-full pl-10 pr-3 text-md py-[9px]   rounded-lg leading-5 bg-gray-100 placeholder:font-light placeholder-gray-500 focus:outline-none focus:placeholder-gray-400  transition duration-150 ease-in-out"
-                  placeholder="Search"
-                  type="text"
-                />
-                {isSearching ? (
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <RotatingLines
-                      strokeColor="grey"
-                      strokeWidth="5"
-                      animationDuration="0.75"
-                      width="18"
-                      visible={true}
-                    />
-                  </div>
-                ) : searchInput.length > 0 ? (
-                  <div
-                    onClick={() => setSearchInput("")}
-                    className="absolute cursor-pointer  inset-y-0 right-0 pr-3 flex items-center"
-                  >
-                    <svg
-                      className="text-gray-300 rotate-45"
-                      stroke="currentColor"
-                      fill="currentColor"
-                      strokeWidth="0"
-                      viewBox="0 0 16 16"
-                      height="14px"
-                      width="14px"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"></path>
-                    </svg>
-                  </div>
-                ) : null}
-                {!isSearching && isShowSearchResults ? (
-                  <div
-                    ref={searchResultsRef}
-                    className="absolute top-11 left-1/2 -translate-x-1/2 translate-y-0 pt-2"
-                  >
-                    <div className="relative bg-white border border-gray-200 rounded-md shadow-xl w-96">
-                      <div className="absolute top-0 w-4 h-4 origin-center transform rotate-45 left-1/2 -translate-x-1/2  -translate-y-2 bg-white border-t border-l border-gray-200 rounded-sm pointer-events-none"></div>
-                      <div className="relative pt-2 pb-2">
-                        {searchResults.length > 0 ? (
-                          <div className="flex flex-col overflow-x-hidden overflow-y-hidden">
-                            {searchResults.map((user) => (
-                              <div
-                                // onClick={() => router.push(`/user/${user.uid}`)}
-                                key={user.id}
-                                className="block py-2 px-5 cursor-pointer hover:bg-gray-100"
-                              >
-                                <div className="outline-none">
-                                  <Link href={`/user/${user.uid}`}>
-                                  <div className="flex flex-row justify-start items-center">
-                                    <div className="h-9 w-9 rounded-full">
-                                      <img
-                                        src={
-                                          userData?.profilePicture
-                                            ? userData?.profilePicture
-                                            : "/assets/image/Navbar/default_profile_pic.jpeg"
-                                        }
-                                        className="rounded-full h-9 w-9"
-                                      />
-                                    </div>
-                                    <div>
-                                      <div className="ml-2 flex flex-col min-w-0 min-h-0 flex-auto justify-center">
-                                        <div>
-                                          <div className="inline m-0 text-sm leading-4 font-medium">
-                                            {user.displayName}
-                                          </div>
-                                        </div>
-                                        <div className="text-sm text-gray-500 leading-4">
-                                          {user.fullName}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  </Link>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="p-3">
-                            <p className="text-center">
-                              No users could be found with the specified name.
-                              Please refine your search.
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-            </div>
-          </div>
-          {/* Icons */}
           {user ? (
             <>
+              {/* Search */}
+              <div className="hidden flex-1 md:flex items-center justify-center px-16 lg:ml-12">
+                <div className="max-w-lg w-full lg:max-w-xs relative">
+                  <label htmlFor="search" className="sr-only">
+                    Search
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg
+                        className="h-5 w-5 text-gray-400"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <input
+                      id="search"
+                      name="search"
+                      value={searchInput}
+                      onChange={(e) => setSearchInput(e.target.value)}
+                      className="block w-full pl-10 pr-3 text-md py-[9px]   rounded-lg leading-5 bg-gray-100 placeholder:font-light placeholder-gray-500 focus:outline-none focus:placeholder-gray-400  transition duration-150 ease-in-out"
+                      placeholder="Search"
+                      type="text"
+                    />
+                    {isSearching ? (
+                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <RotatingLines
+                          strokeColor="grey"
+                          strokeWidth="5"
+                          animationDuration="0.75"
+                          width="18"
+                          visible={true}
+                        />
+                      </div>
+                    ) : searchInput.length > 0 ? (
+                      <div
+                        onClick={() => setSearchInput("")}
+                        className="absolute cursor-pointer  inset-y-0 right-0 pr-3 flex items-center"
+                      >
+                        <svg
+                          className="text-gray-300 rotate-45"
+                          stroke="currentColor"
+                          fill="currentColor"
+                          strokeWidth="0"
+                          viewBox="0 0 16 16"
+                          height="14px"
+                          width="14px"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"></path>
+                        </svg>
+                      </div>
+                    ) : null}
+                    {!isSearching && isShowSearchResults ? (
+                      <div
+                        ref={searchResultsRef}
+                        className="absolute top-11 left-1/2 -translate-x-1/2 translate-y-0 pt-2"
+                      >
+                        <div className="relative bg-white border border-gray-200 rounded-md shadow-xl w-96">
+                          <div className="absolute top-0 w-4 h-4 origin-center transform rotate-45 left-1/2 -translate-x-1/2  -translate-y-2 bg-white border-t border-l border-gray-200 rounded-sm pointer-events-none"></div>
+                          <div className="relative pt-2 pb-2">
+                            {searchResults.length > 0 ? (
+                              <div className="flex flex-col overflow-x-hidden overflow-y-hidden">
+                                {searchResults.map((user) => (
+                                  <div
+                                    // onClick={() => router.push(`/user/${user.uid}`)}
+                                    key={user.id}
+                                    className="block py-2 px-5 cursor-pointer hover:bg-gray-100"
+                                  >
+                                    <div className="outline-none">
+                                      <Link href={`/user/${user.uid}`}>
+                                        <div className="flex flex-row justify-start items-center">
+                                          <div className="h-9 w-9 rounded-full">
+                                            <img
+                                              src={
+                                                userData?.profilePicture
+                                                  ? userData?.profilePicture
+                                                  : "/assets/image/Navbar/default_profile_pic.jpeg"
+                                              }
+                                              className="rounded-full h-9 w-9"
+                                            />
+                                          </div>
+                                          <div>
+                                            <div className="ml-2 flex flex-col min-w-0 min-h-0 flex-auto justify-center">
+                                              <div>
+                                                <div className="inline m-0 text-sm leading-4 font-medium">
+                                                  {user.displayName}
+                                                </div>
+                                              </div>
+                                              <div className="text-sm text-gray-500 leading-4">
+                                                {user.fullName}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </Link>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="p-3">
+                                <p className="text-center">
+                                  No users could be found with the specified
+                                  name. Please refine your search.
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
               <div className="block xs:hidden relative">
                 <div
                   onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
@@ -629,16 +627,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                 </div>
               </div>
             </>
-          ) : (
-            <div className="flex space-x-6">
-              <Link href="/login">
-                <button className="text-blue-400">Log in</button>
-              </Link>
-              <Link href="/sign-up">
-                <button className="text-blue-400">Sign up</button>
-              </Link>
-            </div>
-          )}
+          ) : null}
         </div>
       </div>
       {isCreatePostModalOpen && (

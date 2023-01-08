@@ -3,6 +3,7 @@ import {
   FacebookAuthProvider,
   GoogleAuthProvider,
   onAuthStateChanged,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
@@ -43,6 +44,7 @@ interface IAuthContext {
   logOut: () => Promise<void>;
   signUpWithGoogle: () => Promise<void>;
   signUpWithFacebook: () => Promise<void>;
+  sendPasswordResetLink: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<IAuthContext>({} as IAuthContext);
@@ -179,6 +181,10 @@ export const AuthContextProvider = ({
     return signInWithEmailAndPassword(auth, email, password);
   };
 
+  const sendPasswordResetLink = (email: string) => {
+    return sendPasswordResetEmail(auth, email);
+  };
+
   const logOut = async () => {
     setUser(null);
     await signOut(auth);
@@ -193,6 +199,7 @@ export const AuthContextProvider = ({
         logOut,
         signUpWithGoogle,
         signUpWithFacebook,
+        sendPasswordResetLink,
       }}
     >
       {loading ? null : children}

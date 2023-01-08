@@ -236,11 +236,13 @@ export const Login: React.FC<ILoginProps> = () => {
                         </a>
                       </div>
                     </div>
+                    <Link href={"/accounts/password/reset"}>
                     <a className="flex justify-center pt-4 pb-5">
                       <span className="cursor-pointer text-blue-900 text-[13px]">
                         Forgot password?
                       </span>
                     </a>
+                    </Link>
                   </form>
                 </div>
               </div>
