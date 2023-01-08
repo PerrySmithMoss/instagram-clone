@@ -44,7 +44,7 @@ const SuggestedPeoplePage: NextPage = () => {
                     <svg
                       stroke="currentColor"
                       fill="#262626"
-                      stroke-width="0"
+                      strokeWidth="0"
                       viewBox="0 0 512 512"
                       height="30px"
                       width="30px"
@@ -90,7 +90,7 @@ const SuggestedPeoplePage: NextPage = () => {
                   </div>
                   <div className="flex justify-center mx-16 my-1">
                     <p className="text-[#8E8E8E] text-center text-[15px] leading-[19px]">
-                      Enter your email, phone, or username and we'll send you a
+                      Enter your email, phone, or username and we&apos;ll send you a
                       link to get back into your account.
                     </p>
                   </div>
