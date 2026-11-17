@@ -471,9 +471,9 @@ sm:inline-block block"
                 </li>
               </ul>
               <div className="flex flex-wrap -mx-px md:-mx-3">
-                {posts &&
-                  posts.length > 0 &&
-                  posts.map((post) => <Post key={post.id} post={post} />)}
+                {posts.map((post) => (
+                  <Post key={post.id} post={post} />
+                ))}
               </div>
             </div>
           </div>
