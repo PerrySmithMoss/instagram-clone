@@ -128,11 +128,9 @@ export const Profile: React.FC = () => {
   // if userId !== user.uid then show the users profile with option to follow/unfollow etc.
   if (loading) {
     return (
-      <div className="bg-gray-50 h-screen">
+      <div className="bg-gray-50 min-h-screen">
         <Head>
-          <title>Instagram</title>
-          <meta name="description" content="Instagram" />
-          <link rel="icon" href="/favicon.ico" />
+          <title>Photo Journal</title>
         </Head>
         <Navbar />
         <div className="flex justify-center mt-10">
@@ -143,13 +141,11 @@ export const Profile: React.FC = () => {
   }
   if (foundUser && posts && router.query.id && user && currentUser) {
     return (
-      <div className="bg-gray-50 h-screen">
+      <div className="bg-gray-50 min-h-screen">
         <Head>
           <title>
-            {user.fullName} @{user.username} | Instagram
+            {user.fullName} @{user.username} | Photo Journal
           </title>
-          <meta name="description" content="Instagram" />
-          <link rel="icon" href="/favicon.ico" />
         </Head>
         <Navbar />
         <main className="max-w-[975px] mx-auto">
@@ -482,11 +478,9 @@ sm:inline-block block"
     );
   }
   return (
-    <div className="bg-gray-50 h-screen">
+    <div className="bg-gray-50 min-h-screen">
       <Head>
-        <title>Page not found | Instagram</title>
-        <meta name="description" content="Instagram" />
-        <link rel="icon" href="/favicon.ico" />
+        <title>Page not found | Photo Journal</title>
       </Head>
       <Navbar />
       <div className="mt-10">
@@ -500,7 +494,7 @@ sm:inline-block block"
             onClick={() => router.push("/")}
             className="text-blue-500 hover:text-blue-600 cursor-pointer"
           >
-            Go back to Instagram.
+            Go back to Photo Journal.
           </span>
         </p>
       </div>

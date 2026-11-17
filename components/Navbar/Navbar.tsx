@@ -8,6 +8,7 @@ import useDebounce from "../../hooks/useDebounce";
 import { useOnClickOutside } from "../../hooks/useOnClickOustide";
 import { CreatePostModal } from "../Modal/CreatePost/CreatePostModal";
 import { Spinner } from "../Spinner";
+import { Brand } from "../SiteIdentity";
 import { useUserData } from "../../context/UserContext";
 import { IUserData } from "../../types/userData";
 
@@ -83,14 +84,7 @@ export const Navbar: React.FC = () => {
         <div className="flex justify-between items-center content-center max-w-[975px] pt-3 pb-3 mx-auto px-4">
           {/* Logo */}
           <Link href="/" className="contents">
-            <Image
-              unoptimized
-              width={1024}
-              height={1024}
-              src="/assets/image/Navbar/logo3.png"
-              className="cursor-pointer w-auto h-auto"
-              alt="Instagram"
-            />
+            <Brand />
           </Link>
           {user ? (
             <>
@@ -182,7 +176,7 @@ export const Navbar: React.FC = () => {
                                                   : "/assets/image/Navbar/default_profile_pic.jpeg"
                                               }
                                               className="rounded-full h-9 w-9"
-                                              alt="Instagram"
+                                              alt="Profile photo"
                                             />
                                           </div>
                                           <div>

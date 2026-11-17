@@ -19,8 +19,8 @@ export const Feed: React.FC = () => {
       </section>
       {/* Section Right */}
       {user ? (
-        <section className="hidden lg:inline-grid md:col-span-3">
-          <div className="fixed top-20 ">
+        <section className="hidden lg:block md:col-span-3">
+          <div className="sticky top-20 flow-root mr-10">
             <MiniProfile />
             <Suggestions />
           </div>

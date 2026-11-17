@@ -12,9 +12,7 @@ const Home: NextPage = () => {
     return (
       <div className="bg-gray-50 ">
         <Head>
-          <title>Login | Instagram</title>
-          <meta name="description" content="Instagram" />
-          <link rel="icon" href="/favicon.ico" />
+          <title>Login | Photo Journal</title>
         </Head>
         <Login />
       </div>
@@ -22,9 +20,7 @@ const Home: NextPage = () => {
   return (
     <div className="bg-gray-50 ">
       <Head>
-        <title>Instagram</title>
-        <meta name="description" content="Instagram" />
-        <link rel="icon" href="/favicon.ico" />
+        <title>Photo Journal</title>
       </Head>
       <Navbar />
       <Feed />
