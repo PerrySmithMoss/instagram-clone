@@ -1,6 +1,8 @@
-# Instagram Clone
+# Photo Journal
 
-A Next.js and Firebase app with posts, comments, likes, profiles, following, and email or social authentication.
+An independent Next.js and Firebase photo-sharing demo by Perry Smith-Moss, with posts, comments, likes, profiles, following, and email or social authentication. The repository retains its original name, `instagram-clone`; the app is not affiliated with or endorsed by Instagram, Meta, or Facebook.
+
+Use a separate demo account and a unique password. Instagram credentials do not work here. Email/password authentication and reset requests go directly to Firebase Authentication; social sign-in uses Firebase's provider popup flow. The public `/about` page explains account and data handling without requiring sign-in or JavaScript.
 
 ## Local setup
 
@@ -43,3 +45,5 @@ GitHub Actions runs these checks and CodeQL's `security-and-quality` query suite
 The Vercel project is `instagram-clone-ohdn`, linked to the `main` branch. Select Node **26.x** in its build settings. Vercel manages minor and patch releases automatically; `.nvmrc` and `package.json` pin the local version to **26.13.0**.
 
 Store the Firebase web configuration in the Vercel project's environment variables. Local `.env` files and browser test output are ignored by Git.
+
+The project is currently subject to a Vercel abuse restriction. Source changes do not clear that restriction automatically. See [the review notes](docs/vercel-review.md) for confirmed facts, the suspected presentation issue, and the information prepared for Vercel's review.

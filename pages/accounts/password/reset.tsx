@@ -6,8 +6,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "../../../context/AuthContext";
 import Image from "next/image";
+import { DemoAccountNotice } from "../../../components/SiteIdentity";
 
-const SuggestedPeoplePage: NextPage = () => {
+const ResetPasswordPage: NextPage = () => {
   const [emailInput, setEmailInput] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [resetError, setResetError] = useState("");
@@ -34,14 +35,13 @@ const SuggestedPeoplePage: NextPage = () => {
   return (
     <div className="bg-gray-50 ">
       <Head>
-        <title>Reset Password | Instagram</title>
-        <meta name="description" content="Instagram" />
-        <link rel="icon" href="/favicon.ico" />
+        <title>Reset Password | Photo Journal</title>
       </Head>
       <Navbar />
-      <section className="flex justify-center h-screen sm:py-[40px]">
+      <section className="flex justify-center min-h-[70vh] py-8">
         <main className="flex flex-col">
           <div className="w-full relative px-3 max-w-[500px] my-0 mx-auto grow shrink-0 flex flex-col items-stretch py-0">
+            <DemoAccountNotice />
             <div className="flex flex-col items-stretch content-center justify-start relative border rounded-xs bg-white">
               {showPasswordResetLinkSuccess ? (
                 <div className="flex flex-col relative mb-5">
@@ -98,8 +98,9 @@ const SuggestedPeoplePage: NextPage = () => {
                   </div>
                   <div className="flex justify-center mx-16 my-1">
                     <p className="text-[#8E8E8E] text-center text-[15px] leading-[19px]">
-                      Enter your email, phone, or username and we&apos;ll send
-                      you a link to get back into your account.
+                      Enter the email address for your Photo Journal account to
+                      request a password reset link. This cannot reset an
+                      Instagram password.
                     </p>
                   </div>
                   <div className="my-2 mt-3 flex justify-center w-full">
@@ -131,8 +132,8 @@ const SuggestedPeoplePage: NextPage = () => {
                           disabled={!emailInput.trim() || isSending}
                           className={
                             emailInput.length > 0
-                              ? `bg-[#0095f6] rounded-sm text-sm  w-full text-white py-2`
-                              : `cursor-default bg-[#0095f6] opacity-[0.50] rounded-sm text-sm  w-full text-white py-1.5`
+                              ? `bg-[#0f766e] rounded-sm text-sm  w-full text-white py-2`
+                              : `cursor-default bg-[#0f766e] opacity-[0.50] rounded-sm text-sm  w-full text-white py-1.5`
                           }
                         >
                           {isSending ? "Sending…" : "Send reset link"}
@@ -171,167 +172,10 @@ const SuggestedPeoplePage: NextPage = () => {
               )}
             </div>
           </div>
-          <footer className="px-5 items-stretch flex flex-col shrink-0 m-0 relative">
-            <div className="flex text-[#8e8e8e] font-normal text-[12px] grow-0 shrink-0 basis-0 items-stretch m-0 relative p-0 flex-col mb-[52px]">
-              <div className="flex pb-1.5 grow-0 shrink-0 basis-auto content-start flex-col items-stretch">
-                <div className=" flex-wrap space-x-4 grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                  <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                    <a>
-                      <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                        Meta
-                      </div>
-                    </a>
-                  </div>
-                  <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                    <a>
-                      <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                        About
-                      </div>
-                    </a>
-                  </div>
-                  <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                    <a>
-                      <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                        Blog
-                      </div>
-                    </a>
-                  </div>
-                  <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                    <a>
-                      <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                        Jobs
-                      </div>
-                    </a>
-                  </div>
-                  <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                    <a>
-                      <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                        API
-                      </div>
-                    </a>
-                  </div>
-                  <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                    <a>
-                      <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                        Privacy
-                      </div>
-                    </a>
-                  </div>
-                  <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                    <a>
-                      <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                        Terms
-                      </div>
-                    </a>
-                  </div>
-                  <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                    <a>
-                      <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                        Top Accounts
-                      </div>
-                    </a>
-                  </div>
-                  <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                    <a>
-                      <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                        Hashtags
-                      </div>
-                    </a>
-                  </div>
-                  <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                    <a>
-                      <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                        Locations
-                      </div>
-                    </a>
-                  </div>
-                  <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                    <a>
-                      <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                        Instagram Lite
-                      </div>
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div className="flex grow-0 shrink-0 basis-auto justify-center flex-row items-stretch">
-                <div className=" flex-wrap space-x-4  grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                  <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                    <a>
-                      <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                        Dance
-                      </div>
-                    </a>
-                  </div>
-                  <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                    <a>
-                      <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                        Food & Drink
-                      </div>
-                    </a>
-                  </div>
-                  <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                    <a>
-                      <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                        Home & Garden
-                      </div>
-                    </a>
-                  </div>
-                  <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                    <a>
-                      <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                        Music
-                      </div>
-                    </a>
-                  </div>
-                  <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                    <a>
-                      <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                        Visual Art
-                      </div>
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div className=" mt-4 mb-3 space-x-4  flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                  <a>
-                    <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                      <span className="inline-block relative">
-                        <div className=" items-center flex flex-row justify-center">
-                          <span>English</span>
-                          <div className="ml-1 flex justify-start flex-col items-stretch">
-                            <span className=" inline-block rotate-180">
-                              <svg
-                                aria-label="Down Chevron Icon"
-                                color="#8e8e8e"
-                                viewBox="0 0 24 24"
-                                height={12}
-                                width={12}
-                              >
-                                <path d="M21 17.502a.997.997 0 01-.707-.293L12 8.913l-8.293 8.296a1 1 0 11-1.414-1.414l9-9.004a1.03 1.03 0 011.414 0l9 9.004A1 1 0 0121 17.502z"></path>
-                              </svg>
-                            </span>
-                          </div>
-                        </div>
-                      </span>
-                    </div>
-                  </a>
-                </div>
-                <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                  <a>
-                    <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
-                      @ 2022 Perry Smith-Moss
-                    </div>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </footer>
         </main>
       </section>
     </div>
   );
 };
 
-export default SuggestedPeoplePage;
+export default ResetPasswordPage;

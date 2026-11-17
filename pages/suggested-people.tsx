@@ -19,9 +19,7 @@ const SuggestedPeoplePage: NextPage = () => {
   return (
     <div className="bg-gray-50 ">
       <Head>
-        <title>Suggested People | Instagram</title>
-        <meta name="description" content="Instagram" />
-        <link rel="icon" href="/favicon.ico" />
+        <title>Suggested People | Photo Journal</title>
       </Head>
       <Navbar />
       <SuggestedPeople />

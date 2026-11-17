@@ -1,69 +1,3 @@
-.authLoginImageWrapper {
-  background-image: url("/assets/image/Login/login-phones.png");
-  align-self: center;
-  align-items: stretch;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  margin: 0;
-  padding: 0;
-  position: relative;
-  background-position: -46px 0;
-  background-size: 469px 635px;
-  flex-basis: 380px;
-  height: 582px;
-  /* margin-left: -35px; */
-  margin-bottom: 12px;
-  margin-right: 32px;
-}
-.authLoginImageContainer {
-  margin: 27px 0 0 113px;
-  position: relative;
-}
-.authLoginImage {
-  height: 538px;
-  left: 0;
-  position: absolute;
-  top: 0;
-  width: 250px;
-  animation-name: multiple-image-crossfade;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  animation-duration: 20s;
-}
-
-.authLoginImageContainer img:nth-of-type(1) {
-  animation-delay: 15s;
-}
-.authLoginImageContainer img:nth-of-type(2) {
-  animation-delay: 10s;
-}
-.authLoginImageContainer img:nth-of-type(3) {
-  animation-delay: 5s;
-}
-.authLoginImageContainer img:nth-of-type(4) {
-  animation-delay: 0;
-}
-
-@keyframes multiple-image-crossfade {
-  0% {
-    opacity: 1;
-  }
-  17% {
-    opacity: 1;
-  }
-  25% {
-    opacity: 0;
-  }
-  92% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
 .formBorder {
   border: 1px solid rgba(var(--b6a, 219, 219, 219), 1);
   background-color: rgba(var(--d87, 255, 255, 255), 1);
@@ -99,10 +33,4 @@
 
 .orSeperator:not(:empty)::after {
   margin-left: 0.25em;
-}
-
-@media only screen and (max-width: 875px) {
-  .authLoginImageWrapper {
-    display: none;
-  }
 }
