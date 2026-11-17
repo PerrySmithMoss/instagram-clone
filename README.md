@@ -42,7 +42,7 @@ GitHub Actions runs these checks and CodeQL's `security-and-quality` query suite
 
 ## Deployment
 
-The Vercel project is `instagram-clone-ohdn`, linked to the `main` branch. Select Node **26.x** in its build settings. Vercel manages minor and patch releases automatically; `.nvmrc` and `package.json` pin the local version to **26.13.0**.
+The Vercel project is `instagram-clone-ohdn`, linked to the `main` branch. Select Node **26.x** in its build settings. Vercel manages minor and patch releases automatically; `.nvmrc` pins the local version to **26.13.0**, while `package.json` accepts **26.x**. An exact engine requirement would reject Vercel's managed patch updates (for example, 26.13.1).
 
 Store the Firebase web configuration in the Vercel project's environment variables. Local `.env` files and browser test output are ignored by Git.
 

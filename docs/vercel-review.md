@@ -5,9 +5,10 @@
 - Project: `instagram-clone-ohdn`, team `perrysmithmoss-projects`.
 - Production URL: <https://instagram-clone-xi-eight.vercel.app/>.
 - The original email, “Regarding your use of Vercel,” was sent by `notifications@vercel.com` on 3 August 2026 at 20:13 UK time. It says the project was suspended for a Terms of Service violation and lists common causes (resource use, prohibited content, and acceptable use). It does **not** identify the specific cause for this project.
-- On 17 November 2026 the dashboard still showed “This project has been flagged for abuse”; production returned HTTP 451 / `DEPLOYMENT_DISABLED`, and deployment creation returned HTTP 400 before building.
+- On 17 November 2026 the dashboard still showed “This project has been flagged for abuse”; production returned HTTP 451 / `DEPLOYMENT_DISABLED`, and manual production deployment requests returned HTTP 400 before building.
 - Vercel Safety Support acknowledged an appeal on 17 November 2026 at 12:48 UK time: an existing support case. No review decision was found during this investigation.
 - Project Node is set to `26.x`; the old production deployment used Node 16. The suspension predates the current Node and dependency updates.
+- The GitHub integration did create a preview for the remediation branch. Its first build used Node 26.13.1, but Yarn rejected the exact `26.13.0` package engine requirement. This is a separate build compatibility issue. The engine range is now `26.x`, while `.nvmrc` retains the exact local pin.
 
 ## Source review and likely concern
 
@@ -23,8 +24,9 @@ The old public interface copied Instagram's wordmark, app screenshots, store dow
 - A warning beside authentication forms to use separate demo accounts and never enter an Instagram password.
 - A public `/about` page describing the operator, relationship to the original repository, Firebase authentication, and stored profile/social data; available without JavaScript or authentication.
 - Form submit handlers for keyboard and mouse input, with tests checking that dummy passwords go only to Firebase Authentication. Existing Firebase account functionality remains.
+- Accept Vercel's managed Node 26 minor/patch releases through `engines.node: 26.x`; keep `.nvmrc` pinned to v26.13.0.
 
-These changes must be reviewed in the source branch until Vercel permits a new deployment. The currently blocked production deployment does not contain them. Only Vercel can decide whether they satisfy its requirements or whether it needs other changes.
+The currently blocked production deployment does not contain these changes. The source branch and screenshots are available for review. A successful preview build does not by itself establish that production has been reinstated. Only Vercel can decide whether the changes satisfy its requirements or whether it needs other changes.
 
 ## Validation and screenshots
 
