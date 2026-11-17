@@ -128,7 +128,7 @@ export const Profile: React.FC = () => {
   // if userId !== user.uid then show the users profile with option to follow/unfollow etc.
   if (loading) {
     return (
-      <div className="bg-gray-50 h-screen">
+      <div className="bg-gray-50 min-h-screen">
         <Head>
           <title>Photo Journal</title>
         </Head>
@@ -141,7 +141,7 @@ export const Profile: React.FC = () => {
   }
   if (foundUser && posts && router.query.id && user && currentUser) {
     return (
-      <div className="bg-gray-50 h-screen">
+      <div className="bg-gray-50 min-h-screen">
         <Head>
           <title>
             {user.fullName} @{user.username} | Photo Journal
@@ -478,7 +478,7 @@ sm:inline-block block"
     );
   }
   return (
-    <div className="bg-gray-50 h-screen">
+    <div className="bg-gray-50 min-h-screen">
       <Head>
         <title>Page not found | Photo Journal</title>
       </Head>
