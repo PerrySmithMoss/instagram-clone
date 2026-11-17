@@ -5,7 +5,7 @@ import AuthStyles from "../../../components/Auth/auth.module.css";
 import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "../../../context/AuthContext";
-import Image from "next/image";
+import Image from "next/legacy/image";
 
 const SuggestedPeoplePage: NextPage = () => {
   const [emailInput, setEmailInput] = useState("");
@@ -141,14 +141,14 @@ const SuggestedPeoplePage: NextPage = () => {
                     </div>
                   </div>
                   <div className="flex justify-center mt-1 mb-20">
-                    <Link href={"/sign-up"}>
+                    <Link legacyBehavior href={"/sign-up"}>
                       <a className="font-semibold text-sm">
                         Create new account
                       </a>
                     </Link>
                   </div>
                   <div className="flex justify-center p-3 border-t bg-[#FAFAFA]">
-                    <Link href={"/"}>
+                    <Link legacyBehavior href={"/"}>
                       <a className="text-[#262626] text-sm font-semibold">
                         Back to login
                       </a>

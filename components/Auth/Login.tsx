@@ -236,7 +236,7 @@ export const Login: React.FC<ILoginProps> = () => {
                         </a>
                       </div>
                     </div>
-                    <Link href={"/accounts/password/reset"}>
+                    <Link legacyBehavior href={"/accounts/password/reset"}>
                     <a className="flex justify-center pt-4 pb-5">
                       <span className="cursor-pointer text-blue-900 text-[13px]">
                         Forgot password?
@@ -250,7 +250,7 @@ export const Login: React.FC<ILoginProps> = () => {
                 <div className="flex justify-center py-5">
                   <p className=" text-sm text-[#262626]">
                     Don&apos;t have an account?{" "}
-                    <Link href="/sign-up">
+                    <Link legacyBehavior href="/sign-up">
                       <span className="cursor-pointer text-[#0095f6] hover:text-blue-500 font-semibold">
                         Sign up
                       </span>

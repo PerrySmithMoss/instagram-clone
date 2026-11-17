@@ -335,7 +335,7 @@ export const SignUp: React.FC<ISignUpProps> = () => {
                 <div className="flex justify-center py-5">
                   <p className=" text-sm text-[#262626]">
                     Have an account?{" "}
-                    <Link href="/">
+                    <Link legacyBehavior href="/">
                       <span className="cursor-pointer text-[#0095f6] hover:text-blue-500 font-semibold">
                         Log in
                       </span>

@@ -95,7 +95,7 @@ export const SuggestedPeople: React.FC<ISuggestedPeopleProps> = ({}) => {
                     key={suggestion.uid}
                     className="py-2 px-3 flex flex-row justify-start items-center relative"
                   >
-                    <Link href={`/user/${suggestion.uid}`}>
+                    <Link legacyBehavior href={`/user/${suggestion.uid}`}>
                       <img
                         src={
                           suggestion?.profilePicture
@@ -107,7 +107,7 @@ export const SuggestedPeople: React.FC<ISuggestedPeopleProps> = ({}) => {
                       />
                     </Link>
                     <div className="flex-1 ml-4">
-                      <Link href={`/user/${suggestion.uid}`}>
+                      <Link legacyBehavior href={`/user/${suggestion.uid}`}>
                         <h2 className="font-semibold cursor-pointer text-sm">
                           {suggestion.username}
                         </h2>
