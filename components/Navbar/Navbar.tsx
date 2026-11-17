@@ -1,4 +1,5 @@
-import { collection, getDocs, query, where } from "firebase/firestore";
+import Image from "next/image";
+import { collection, getDocs, limit, query, where } from "firebase/firestore";
 import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
@@ -6,22 +7,31 @@ import { db } from "../../firebase";
 import useDebounce from "../../hooks/useDebounce";
 import { useOnClickOutside } from "../../hooks/useOnClickOustide";
 import { CreatePostModal } from "../Modal/CreatePost/CreatePostModal";
-import { RotatingLines } from "react-loader-spinner";
+import { Spinner } from "../Spinner";
 import { useUserData } from "../../context/UserContext";
 import { IUserData } from "../../types/userData";
 
-interface INavbarProps {}
-
-export const Navbar: React.FC<INavbarProps> = ({}) => {
+export const Navbar: React.FC = () => {
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   const [searchInput, setSearchInput] = useState("");
   const debouncedSearchTerm = useDebounce(searchInput, 1000);
-  const [isSearching, setIsSearching] = useState(false);
-  const [isShowSearchResults, setIsShowSearchResults] = useState(false);
-  const [searchResults, setSearchResults] = useState<IUserData[]>([]);
+  const [search, setSearch] = useState<{ term: string; users: IUserData[] }>({
+    term: "",
+    users: [],
+  });
+  const [dismissedSearch, setDismissedSearch] = useState<string | null>(null);
+  const searchResults = search.users;
+  const isSearching = Boolean(
+    searchInput &&
+    (debouncedSearchTerm !== searchInput ||
+      search.term !== debouncedSearchTerm),
+  );
+  const isShowSearchResults = Boolean(
+    searchInput && dismissedSearch !== searchInput,
+  );
 
   const { user, logOut } = useAuth();
   const { userData } = useUserData();
@@ -34,67 +44,52 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
 
   const searchResultsRef = useRef(null);
   const handleExitSearch = () => {
-    setIsShowSearchResults(false);
+    setDismissedSearch(searchInput);
   };
   useOnClickOutside(searchResultsRef, handleExitSearch);
 
-  async function getUsers() {
-    const doc = query(
+  useEffect(() => {
+    if (!debouncedSearchTerm.trim()) return;
+    let active = true;
+    const usersQuery = query(
       collection(db, "users"),
       where("fullName", ">=", debouncedSearchTerm.toUpperCase()),
-      where("fullName", "<=", debouncedSearchTerm.toLowerCase() + "\uf8ff")
+      where("fullName", "<=", debouncedSearchTerm.toLowerCase() + "\uf8ff"),
+      limit(20),
     );
-
-    getDocs(doc).then((querySnapshot) => {
-      let values: any = [];
-      querySnapshot.forEach((doc) => {
-        let data = {
-          ...doc.data(),
-          id: doc.id,
-        };
-        values.push(data);
+    getDocs(usersQuery)
+      .then((snapshot) => {
+        if (!active) return;
+        const users = snapshot.docs
+          .map((user) => ({ ...user.data(), id: user.id }) as IUserData)
+          .filter((user) =>
+            user.fullName
+              .toLowerCase()
+              .startsWith(debouncedSearchTerm.toLowerCase()),
+          );
+        setSearch({ term: debouncedSearchTerm, users });
+      })
+      .catch(() => {
+        if (active) setSearch({ term: debouncedSearchTerm, users: [] });
       });
-      setSearchResults(values);
-    });
-
-    setIsSearching(false);
-    setIsShowSearchResults(true);
-  }
-
-  useEffect(() => {
-    if (debouncedSearchTerm.length === 0) {
-      setIsSearching(false);
-      setIsShowSearchResults(false);
-      return;
-    }
-
-    setIsSearching(true);
-    setIsShowSearchResults(true);
-
-    getUsers();
+    return () => {
+      active = false;
+    };
   }, [debouncedSearchTerm]);
-
-  useEffect(() => {
-    if (searchInput.length === 0) {
-      setIsSearching(false);
-      setIsShowSearchResults(false);
-
-      return;
-    }
-
-    setIsSearching(true);
-    setIsShowSearchResults(true);
-  }, [searchInput]);
 
   return (
     <>
-      <div className="shadow-sm bg-white border-b sticky top-0 z-50">
+      <div className="shadow-xs bg-white border-b sticky top-0 z-50">
         <div className="flex justify-between items-center content-center max-w-[975px] pt-3 pb-3 mx-auto px-4">
           {/* Logo */}
-          <Link legacyBehavior href="/">
-            <img
+          <Link href="/" className="contents">
+            <Image
+              unoptimized
+              width={1024}
+              height={1024}
               src="/assets/image/Navbar/logo3.png"
-              className="cursor-pointer"
+              className="cursor-pointer w-auto h-auto"
+              alt="Instagram"
             />
           </Link>
           {user ? (
@@ -123,20 +118,17 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                       id="search"
                       name="search"
                       value={searchInput}
-                      onChange={(e) => setSearchInput(e.target.value)}
-                      className="block w-full pl-10 pr-3 text-md py-[9px]   rounded-lg leading-5 bg-gray-100 placeholder:font-light placeholder-gray-500 focus:outline-none focus:placeholder-gray-400  transition duration-150 ease-in-out"
+                      onChange={(e) => {
+                        setSearchInput(e.target.value);
+                        setDismissedSearch(null);
+                      }}
+                      className="block w-full pl-10 pr-3 text-md py-[9px]   rounded-lg leading-5 bg-gray-100 placeholder:font-light placeholder-gray-500 focus:outline-hidden focus:placeholder-gray-400  transition duration-150 ease-in-out"
                       placeholder="Search"
                       type="text"
                     />
                     {isSearching ? (
                       <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <RotatingLines
-                          strokeColor="grey"
-                          strokeWidth="5"
-                          animationDuration="0.75"
-                          width="18"
-                          visible={true}
-                        />
+                        <Spinner size={18} color="grey" />
                       </div>
                     ) : searchInput.length > 0 ? (
                       <div
@@ -163,7 +155,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                         className="absolute top-11 left-1/2 -translate-x-1/2 translate-y-0 pt-2"
                       >
                         <div className="relative bg-white border border-gray-200 rounded-md shadow-xl w-96">
-                          <div className="absolute top-0 w-4 h-4 origin-center transform rotate-45 left-1/2 -translate-x-1/2  -translate-y-2 bg-white border-t border-l border-gray-200 rounded-sm pointer-events-none"></div>
+                          <div className="absolute top-0 w-4 h-4 origin-center transform rotate-45 left-1/2 -translate-x-1/2  -translate-y-2 bg-white border-t border-l border-gray-200 rounded-xs pointer-events-none"></div>
                           <div className="relative pt-2 pb-2">
                             {searchResults.length > 0 ? (
                               <div className="flex flex-col overflow-x-hidden overflow-y-hidden">
@@ -173,17 +165,24 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                                     key={user.id}
                                     className="block py-2 px-5 cursor-pointer hover:bg-gray-100"
                                   >
-                                    <div className="outline-none">
-                                      <Link legacyBehavior href={`/user/${user.uid}`}>
+                                    <div className="outline-hidden">
+                                      <Link
+                                        href={`/user/${user.uid}`}
+                                        className="contents"
+                                      >
                                         <div className="flex flex-row justify-start items-center">
                                           <div className="h-9 w-9 rounded-full">
-                                            <img
+                                            <Image
+                                              unoptimized
+                                              width={1024}
+                                              height={1024}
                                               src={
                                                 userData?.profilePicture
                                                   ? userData?.profilePicture
                                                   : "/assets/image/Navbar/default_profile_pic.jpeg"
                                               }
                                               className="rounded-full h-9 w-9"
+                                              alt="Instagram"
                                             />
                                           </div>
                                           <div>
@@ -242,10 +241,10 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                     className="absolute top-9 -right-3 pt-2"
                   >
                     <div className="relative bg-white border border-gray-200 rounded-md shadow-xl w-[185px]">
-                      <div className="absolute top-0 right-8 w-4 h-4 origin-center transform rotate-45 translate-x-5 -translate-y-2 bg-white border-t border-l border-gray-200 rounded-sm pointer-events-none"></div>
+                      <div className="absolute top-0 right-8 w-4 h-4 origin-center transform rotate-45 translate-x-5 -translate-y-2 bg-white border-t border-l border-gray-200 rounded-xs pointer-events-none"></div>
                       <div className="relative">
                         <div className="flex justify-between cursor-pointer content-center items-center w-full px-4 py-2 space-x-3 hover:bg-gray-50">
-                          <a className="block text-gray-700 whitespace-no-wrap focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out">
+                          <a className="block text-gray-700 whitespace-no-wrap focus:outline-hidden hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out">
                             Search
                           </a>
                           <svg
@@ -281,7 +280,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                         <hr />
                         {/* <Link href={`/user/${user.uid}`}>
                           <div className="flex justify-between cursor-pointer content-center items-center w-full px-4 py-2 space-x-3 hover:bg-gray-50">
-                            <a className="block text-gray-700 whitespace-no-wrap focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out">
+                            <a className="block text-gray-700 whitespace-no-wrap focus:outline-hidden hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out">
                               Messages
                             </a>
                             <svg
@@ -321,7 +320,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                           }}
                           className="flex cursor-pointer justify-between content-center items-center w-full px-4 py-2 space-x-3 hover:bg-gray-50"
                         >
-                          <button className="block text-gray-700 whitespace-no-wrap focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out">
+                          <button className="block text-gray-700 whitespace-no-wrap focus:outline-hidden hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out">
                             Create Post
                           </button>
                           <svg
@@ -368,7 +367,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                         <hr />
                         {/* <Link href={`/user/${user.uid}`}>
                           <div className="flex justify-between cursor-pointer content-center items-center w-full px-4 py-2 space-x-3 hover:bg-gray-50">
-                            <a className="block text-gray-700 whitespace-no-wrap focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out">
+                            <a className="block text-gray-700 whitespace-no-wrap focus:outline-hidden hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out">
                               Notifications
                             </a>
                             <svg
@@ -385,24 +384,27 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                           </div>
                         </Link>
                         <hr /> */}
-                        <Link legacyBehavior href={`/user/${user.uid}`}>
+                        <Link href={`/user/${user.uid}`} className="contents">
                           <div className="flex justify-between cursor-pointer content-center items-center w-full px-4 py-2 space-x-3 hover:bg-gray-50">
-                            <a className="block text-gray-700 whitespace-no-wrap focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out">
+                            <span className="block text-gray-700 whitespace-no-wrap focus:outline-hidden hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out">
                               Profile
-                            </a>
+                            </span>
                             <div
                               onClick={() => setIsProfileOpen(!isProfileOpen)}
                               className="flex w-[20px] h-[20px] justify-center items-center rounded-full"
                             >
-                              <img
-                                className="rounded-full"
+                              <Image
+                                unoptimized
+                                width={1024}
+                                height={1024}
+                                className="rounded-full w-auto h-auto"
                                 alt="Profile Picture"
                                 src={
                                   user?.photoURL
                                     ? user?.photoURL
                                     : userData?.profilePicture
-                                    ? userData?.profilePicture
-                                    : "/assets/image/Navbar/default_profile_pic.jpeg"
+                                      ? userData?.profilePicture
+                                      : "/assets/image/Navbar/default_profile_pic.jpeg"
                                 }
                               />
                             </div>
@@ -410,7 +412,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                         </Link>
                         <button
                           onClick={() => logOut()}
-                          className="block text-left border-t-[6px] cursor-pointer hover:bg-gray-50 w-full px-4 py-2 text-gray-700 whitespace-no-wrap focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out"
+                          className="block text-left border-t-[6px] cursor-pointer hover:bg-gray-50 w-full px-4 py-2 text-gray-700 whitespace-no-wrap focus:outline-hidden hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out"
                         >
                           Log out
                         </button>
@@ -420,7 +422,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                 ) : null}
               </div>
               <div className="items-center content-center justify-end space-x-5 hidden xs:flex">
-                <Link legacyBehavior href="/">
+                <Link href="/" className="contents">
                   <div className="cursor-pointer">
                     <svg
                       aria-label="Home"
@@ -482,7 +484,7 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                         strokeWidth={2}
                       ></polygon>
                     </svg>
-                    <span className="absolute -top-0 left-2 inline-flex items-center justify-center px-1.5 py-1 text-xs leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+                    <span className="absolute top-0 left-2 inline-flex items-center justify-center px-1.5 py-1 text-xs leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
                       1
                     </span>
                   </span>
@@ -549,15 +551,18 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
                     className="flex w-9 h-9 justify-center items-center  mr-2 text-xl rounded-full text-white"
                   >
-                    <img
+                    <Image
+                      unoptimized
+                      width={1024}
+                      height={1024}
                       className="rounded-full w-9 h-9"
                       alt="Profile Picture"
                       src={
                         user?.photoURL
                           ? user?.photoURL
                           : userData?.profilePicture
-                          ? userData?.profilePicture
-                          : "/assets/image/Navbar/default_profile_pic.jpeg"
+                            ? userData?.profilePicture
+                            : "/assets/image/Navbar/default_profile_pic.jpeg"
                       }
                     />
                   </div>
@@ -567,9 +572,9 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                       className="absolute top-9 -right-3 pt-2"
                     >
                       <div className="relative bg-white border border-gray-200 rounded-md shadow-xl w-52">
-                        <div className="absolute top-0 right-12 w-4 h-4 origin-center transform rotate-45 translate-x-5 -translate-y-2 bg-white border-t border-l border-gray-200 rounded-sm pointer-events-none"></div>
+                        <div className="absolute top-0 right-12 w-4 h-4 origin-center transform rotate-45 translate-x-5 -translate-y-2 bg-white border-t border-l border-gray-200 rounded-xs pointer-events-none"></div>
                         <div className="relative">
-                          <Link legacyBehavior href={`/user/${user.uid}`}>
+                          <Link href={`/user/${user.uid}`} className="contents">
                             <div className="flex content-center items-center w-full px-4 py-2 space-x-3 hover:bg-gray-50">
                               <svg
                                 aria-label="Profile"
@@ -608,15 +613,15 @@ export const Navbar: React.FC<INavbarProps> = ({}) => {
                                   strokeLinecap="round"
                                 ></circle>
                               </svg>
-                              <a className="block  text-sm text-gray-700 whitespace-no-wrap focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out">
+                              <span className="block  text-sm text-gray-700 whitespace-no-wrap focus:outline-hidden hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out">
                                 Profile
-                              </a>
+                              </span>
                             </div>
                           </Link>
                           <hr />
                           <button
                             onClick={() => logOut()}
-                            className="block text-left hover:bg-gray-50 w-full px-4 py-2 text-sm text-gray-700 whitespace-no-wrap focus:outline-none hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out"
+                            className="block text-left hover:bg-gray-50 w-full px-4 py-2 text-sm text-gray-700 whitespace-no-wrap focus:outline-hidden hover:text-gray-900 focus:text-gray-900 focus:shadow-outline transition duration-300 ease-in-out"
                           >
                             Log out
                           </button>

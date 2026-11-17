@@ -5,21 +5,29 @@ import AuthStyles from "../../../components/Auth/auth.module.css";
 import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "../../../context/AuthContext";
-import Image from "next/legacy/image";
+import Image from "next/image";
 
 const SuggestedPeoplePage: NextPage = () => {
   const [emailInput, setEmailInput] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const [resetError, setResetError] = useState("");
   const { sendPasswordResetLink } = useAuth();
   const [showPasswordResetLinkSuccess, setShowPasswordResetLinkSuccess] =
     useState(false);
 
-  const handleResetPassword = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if (emailInput.length > 0) {
+    if (!emailInput.trim() || isSending) return;
+    setResetError("");
+    setIsSending(true);
+    try {
+      await sendPasswordResetLink(emailInput.trim());
       setEmailInput("");
-      sendPasswordResetLink(emailInput);
       setShowPasswordResetLinkSuccess(true);
+    } catch {
+      setResetError("Could not send a reset link. Please try again.");
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -33,8 +41,8 @@ const SuggestedPeoplePage: NextPage = () => {
       <Navbar />
       <section className="flex justify-center h-screen sm:py-[40px]">
         <main className="flex flex-col">
-          <div className="w-full relative px-3 max-w-[500px] my-0 mx-auto flex-grow flex-shrink-0 flex flex-col items-stretch py-0">
-            <div className="flex flex-col items-stretch content-center justify-start relative border rounded-sm bg-white">
+          <div className="w-full relative px-3 max-w-[500px] my-0 mx-auto grow shrink-0 flex flex-col items-stretch py-0">
+            <div className="flex flex-col items-stretch content-center justify-start relative border rounded-xs bg-white">
               {showPasswordResetLinkSuccess ? (
                 <div className="flex flex-col relative mb-5">
                   <div
@@ -68,8 +76,8 @@ const SuggestedPeoplePage: NextPage = () => {
                   </div>
                   <div className="flex justify-center mx-16 my-1">
                     <p className="text-[#8E8E8E] text-center text-[15px] leading-[19px]">
-                      You have been sent a password reset link to your specified
-                      email address.
+                      If an account exists for that address, you will receive a
+                      password reset link.
                     </p>
                   </div>
                 </div>
@@ -90,8 +98,8 @@ const SuggestedPeoplePage: NextPage = () => {
                   </div>
                   <div className="flex justify-center mx-16 my-1">
                     <p className="text-[#8E8E8E] text-center text-[15px] leading-[19px]">
-                      Enter your email, phone, or username and we&apos;ll send you a
-                      link to get back into your account.
+                      Enter your email, phone, or username and we&apos;ll send
+                      you a link to get back into your account.
                     </p>
                   </div>
                   <div className="my-2 mt-3 flex justify-center w-full">
@@ -101,8 +109,9 @@ const SuggestedPeoplePage: NextPage = () => {
                       onSubmit={(e) => handleResetPassword(e)}
                     >
                       <input
-                        className={`border bg-gray-50 appearance-none rounded w-full pl-2 py-2 focus:border-gray-400 focus:outline-none active:outline-none active:border-gray-400 autofocus`}
-                        type="text"
+                        className={`border bg-gray-50 appearance-none rounded-sm w-full pl-2 py-2 focus:border-gray-400 focus:outline-hidden active:outline-hidden active:border-gray-400 autofocus`}
+                        type="email"
+                        required
                         aria-label="email"
                         placeholder="Enter email address"
                         aria-required={true}
@@ -119,16 +128,21 @@ const SuggestedPeoplePage: NextPage = () => {
                       <div className="flex justify-center mt-3">
                         <button
                           // onClick={(e) => handleResetPassword(e)}
-                          disabled={!emailInput}
+                          disabled={!emailInput.trim() || isSending}
                           className={
                             emailInput.length > 0
-                              ? `bg-[#0095f6] rounded text-sm  w-full text-white py-2`
-                              : `cursor-default bg-[#0095f6] opacity-[0.50] rounded text-sm  w-full text-white py-1.5`
+                              ? `bg-[#0095f6] rounded-sm text-sm  w-full text-white py-2`
+                              : `cursor-default bg-[#0095f6] opacity-[0.50] rounded-sm text-sm  w-full text-white py-1.5`
                           }
                         >
-                          Send reset link
+                          {isSending ? "Sending…" : "Send reset link"}
                         </button>
                       </div>
+                      {resetError && (
+                        <p role="alert" className="mt-3 text-sm text-red-600">
+                          {resetError}
+                        </p>
+                      )}
                     </form>
                   </div>
                   <div>
@@ -141,17 +155,16 @@ const SuggestedPeoplePage: NextPage = () => {
                     </div>
                   </div>
                   <div className="flex justify-center mt-1 mb-20">
-                    <Link legacyBehavior href={"/sign-up"}>
-                      <a className="font-semibold text-sm">
-                        Create new account
-                      </a>
+                    <Link href={"/sign-up"} className="font-semibold text-sm">
+                      Create new account
                     </Link>
                   </div>
                   <div className="flex justify-center p-3 border-t bg-[#FAFAFA]">
-                    <Link legacyBehavior href={"/"}>
-                      <a className="text-[#262626] text-sm font-semibold">
-                        Back to login
-                      </a>
+                    <Link
+                      href={"/"}
+                      className="text-[#262626] text-sm font-semibold"
+                    >
+                      Back to login
                     </Link>
                   </div>
                 </div>
@@ -159,8 +172,8 @@ const SuggestedPeoplePage: NextPage = () => {
             </div>
           </div>
           <footer className="px-5 items-stretch flex flex-col shrink-0 m-0 relative">
-            <div className="flex text-[#8e8e8e] font-normal text-[12px] flex-grow-0 shrink-0 basis-0 items-stretch m-0 relative p-0 flex-col mb-[52px]">
-              <div className="flex pb-1.5 flex-grow-0 shrink-0 basis-auto content-start flex-col items-stretch">
+            <div className="flex text-[#8e8e8e] font-normal text-[12px] grow-0 shrink-0 basis-0 items-stretch m-0 relative p-0 flex-col mb-[52px]">
+              <div className="flex pb-1.5 grow-0 shrink-0 basis-auto content-start flex-col items-stretch">
                 <div className=" flex-wrap space-x-4 grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
                   <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
                     <a>

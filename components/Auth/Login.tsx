@@ -1,61 +1,55 @@
+import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import AuthStyles from "./auth.module.css";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/router";
-import {
-  FacebookAuthProvider,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from "firebase/auth";
-import { auth } from "../../firebase";
 
-interface ILoginProps {}
-
-export const Login: React.FC<ILoginProps> = () => {
+export const Login: React.FC = () => {
   const [emailInput, setEmailInput] = useState("");
   const [passwordInput, setPasswordInput] = useState("");
-  const { logInWithEmailAndPassword } = useAuth();
+  const [loginError, setLoginError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { logInWithEmailAndPassword, signUpWithGoogle, signUpWithFacebook } =
+    useAuth();
   const router = useRouter();
 
   const handleLogIn = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.preventDefault();
-
+    if (!emailInput.trim() || !passwordInput || isSubmitting) return;
+    setLoginError("");
+    setIsSubmitting(true);
     try {
       await logInWithEmailAndPassword(emailInput, passwordInput);
 
       router.push("/");
-    } catch (err) {
-      console.log("Error while trying to login", err);
+    } catch {
+      setLoginError(
+        "Log in failed. Check your email and password, then try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleLogInWithGoogleOrFacebook = async (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-    authProvider: "facebook" | "google"
+    authProvider: "facebook" | "google",
   ) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    setLoginError("");
+    setIsSubmitting(true);
     try {
-      if (authProvider === "facebook") {
-        const provider = new FacebookAuthProvider();
-        await signInWithPopup(auth, provider);
-
-        router.push("/");
-      } else if (authProvider === "google") {
-        const provider = new GoogleAuthProvider();
-        await signInWithPopup(auth, provider);
-
-        router.push("/");
-      } else {
-        return;
-      }
-    } catch (err) {
-      console.log(
-        `Error while trying to login with ${authProvider} provider: `,
-        err
-      );
+      if (authProvider === "facebook") await signUpWithFacebook();
+      else await signUpWithGoogle();
+      await router.push("/");
+    } catch {
+      setLoginError("Could not log in with that provider. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -63,13 +57,16 @@ export const Login: React.FC<ILoginProps> = () => {
     <div className=" items-stretch flex shrink-0 m-0 p-0 relative h-full">
       <section className=" min-h-screen overflow-hidden flex flex-col grow">
         <main className="bg-[#fafafa] grow order-4 flex">
-          <article className="flex flex-row flex-grow justify-center items-center mt-[32px] mx-auto mb-0 max-w-[935px] w-full pb-[32px]">
+          <article className="flex flex-row grow justify-center items-center mt-[32px] mx-auto mb-0 max-w-[935px] w-full pb-[32px]">
             <div className={AuthStyles.authLoginImageWrapper}>
               <div className={AuthStyles.authLoginImageContainer}>
                 {images.map((image: string, index) => (
-                  <img
+                  <Image
+                    unoptimized
+                    width={1024}
+                    height={1024}
                     key={index}
-                    className={AuthStyles.authLoginImage}
+                    className={`${AuthStyles.authLoginImage} w-auto h-auto`}
                     src={image}
                     alt="Instagram app on iPhone"
                   />
@@ -77,7 +74,7 @@ export const Login: React.FC<ILoginProps> = () => {
               </div>
             </div>
 
-            <div className="flex flex-col flex-grow justify-center items-center content-center mt-4 max-w-sm  pb-5">
+            <div className="flex flex-col grow justify-center items-center content-center mt-4 max-w-sm  pb-5">
               <div className={`${AuthStyles.formBorder} max-w-sm w-full pt-4`}>
                 <div className="flex justify-center mx-auto my-6">
                   <svg
@@ -97,7 +94,7 @@ export const Login: React.FC<ILoginProps> = () => {
                   <form method="post">
                     <div className=" mx-10">
                       <input
-                        className={`border text-xs bg-gray-50 appearance-none rounded w-full pl-2 py-2 focus:border-gray-400 focus:outline-none active:outline-none active:border-gray-400 autofocus`}
+                        className={`border text-xs bg-gray-50 appearance-none rounded-sm w-full pl-2 py-2 focus:border-gray-400 focus:outline-hidden active:outline-hidden active:border-gray-400 autofocus`}
                         type="text"
                         aria-label="email"
                         placeholder="Email"
@@ -115,7 +112,7 @@ export const Login: React.FC<ILoginProps> = () => {
                     </div>
                     <div className="pt-1.5 mx-10">
                       <input
-                        className={`border text-xs bg-gray-50 appearance-none rounded w-full pl-2 py-2 focus:border-gray-400 focus:outline-none active:outline-none active:border-gray-400 autofocus`}
+                        className={`border text-xs bg-gray-50 appearance-none rounded-sm w-full pl-2 py-2 focus:border-gray-400 focus:outline-hidden active:outline-hidden active:border-gray-400 autofocus`}
                         aria-label="password"
                         autoCapitalize="off"
                         aria-required={true}
@@ -133,16 +130,26 @@ export const Login: React.FC<ILoginProps> = () => {
                     <div className="py-3 mx-10">
                       <button
                         onClick={(e) => handleLogIn(e)}
-                        disabled={!emailInput && !passwordInput}
+                        disabled={
+                          !emailInput.trim() || !passwordInput || isSubmitting
+                        }
                         className={
                           emailInput.length > 0 && passwordInput.length > 0
-                            ? `bg-[#0095f6] rounded-sm text-sm  w-full text-white py-1.5`
-                            : ` cursor-default bg-[#0095f6] opacity-[0.32] rounded-sm text-sm  w-full text-white py-1.5`
+                            ? `bg-[#0095f6] rounded-xs text-sm  w-full text-white py-1.5`
+                            : ` cursor-default bg-[#0095f6] opacity-[0.32] rounded-xs text-sm  w-full text-white py-1.5`
                         }
                       >
-                        Log in
+                        {isSubmitting ? "Logging in…" : "Log in"}
                       </button>
                     </div>
+                    {loginError && (
+                      <p
+                        role="alert"
+                        className="mx-10 mb-2 text-sm text-red-600"
+                      >
+                        {loginError}
+                      </p>
+                    )}
                     <div
                       className={`${AuthStyles.orSeperator} flex justify-center text-center items-center mx-10 mt-2`}
                     >
@@ -236,12 +243,13 @@ export const Login: React.FC<ILoginProps> = () => {
                         </a>
                       </div>
                     </div>
-                    <Link legacyBehavior href={"/accounts/password/reset"}>
-                    <a className="flex justify-center pt-4 pb-5">
+                    <Link
+                      href={"/accounts/password/reset"}
+                      className="flex justify-center pt-4 pb-5"
+                    >
                       <span className="cursor-pointer text-blue-900 text-[13px]">
                         Forgot password?
                       </span>
-                    </a>
                     </Link>
                   </form>
                 </div>
@@ -250,7 +258,7 @@ export const Login: React.FC<ILoginProps> = () => {
                 <div className="flex justify-center py-5">
                   <p className=" text-sm text-[#262626]">
                     Don&apos;t have an account?{" "}
-                    <Link legacyBehavior href="/sign-up">
+                    <Link href="/sign-up" className="contents">
                       <span className="cursor-pointer text-[#0095f6] hover:text-blue-500 font-semibold">
                         Sign up
                       </span>
@@ -269,8 +277,11 @@ export const Login: React.FC<ILoginProps> = () => {
                       rel="noopener noreferrer"
                       href="https://itunes.apple.com/app/instagram/id389801252?pt=428156&ct=igweb.loginPage.badge&mt=8&vt=lo"
                     >
-                      <img
-                        className="h-10"
+                      <Image
+                        unoptimized
+                        width={1024}
+                        height={1024}
+                        className="h-10 w-auto"
                         src="/assets/image/Login/download-app.png"
                         alt="Download from Apple App Store"
                       />
@@ -282,8 +293,11 @@ export const Login: React.FC<ILoginProps> = () => {
                       rel="noopener noreferrer"
                       href="https://play.google.com/store/apps/details?id=com.instagram.android&referrer=utm_source%3Dinstagramweb%26utm_campaign%3DloginPage%26ig_mid%3D8146E8C7-CD43-4F34-AC25-D96B41D52CB1%26utm_content%3Dlo%26utm_medium%3Dbadge"
                     >
-                      <img
-                        className=" h-10"
+                      <Image
+                        unoptimized
+                        width={1024}
+                        height={1024}
+                        className=" h-10 w-auto"
                         src="/assets/image/Login/download-app2.png"
                         alt="Download from Google Play Store"
                       />
@@ -295,8 +309,8 @@ export const Login: React.FC<ILoginProps> = () => {
           </article>
         </main>
         <footer className="order-5 py-0 px-5 items-stretch flex flex-col shrink-0 m-0 relative bg-[#fafafa]">
-          <div className="flex text-[#8e8e8e] font-normal text-[12px] flex-grow-0 shrink-0 basis-0 items-stretch m-0 relative p-0 flex-col mb-[52px]">
-            <div className="flex pb-1.5 flex-grow-0 shrink-0 basis-auto content-start flex-col items-stretch">
+          <div className="flex text-[#8e8e8e] font-normal text-[12px] grow-0 shrink-0 basis-0 items-stretch m-0 relative p-0 flex-col mb-[52px]">
+            <div className="flex pb-1.5 grow-0 shrink-0 basis-auto content-start flex-col items-stretch">
               <div className=" flex-wrap space-x-4 grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
                 <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
                   <a>

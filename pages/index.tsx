@@ -4,7 +4,6 @@ import { Login } from "../components/Auth/Login";
 import { Feed } from "../components/Feed/Feed";
 import { Navbar } from "../components/Navbar/Navbar";
 import { useAuth } from "../context/AuthContext";
-import { UserDataContextProvider } from "../context/UserContext";
 
 const Home: NextPage = () => {
   const { user } = useAuth();
@@ -17,21 +16,19 @@ const Home: NextPage = () => {
           <meta name="description" content="Instagram" />
           <link rel="icon" href="/favicon.ico" />
         </Head>
-        <Login />;
+        <Login />
       </div>
     );
   return (
-    <UserDataContextProvider>
-      <div className="bg-gray-50 ">
-        <Head>
-          <title>Instagram</title>
-          <meta name="description" content="Instagram" />
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
-        <Navbar />
-        <Feed />
-      </div>
-    </UserDataContextProvider>
+    <div className="bg-gray-50 ">
+      <Head>
+        <title>Instagram</title>
+        <meta name="description" content="Instagram" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <Navbar />
+      <Feed />
+    </div>
   );
 };
 

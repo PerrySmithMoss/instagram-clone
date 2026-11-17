@@ -1,5 +1,5 @@
 export interface IUserData {
-  id: string
+  id: string;
   displayName: string;
   email: string;
   followers: string[];

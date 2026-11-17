@@ -1,10 +1,9 @@
+import { toggleFollowing } from "../../lib/social";
+import Image from "next/image";
 import { updateProfile } from "firebase/auth";
 import {
-  arrayRemove,
-  arrayUnion,
   collection,
   doc,
-  getDoc,
   onSnapshot,
   query,
   updateDoc,
@@ -18,7 +17,7 @@ import {
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import { Oval } from "react-loader-spinner";
+import { Spinner } from "../Spinner";
 import { Navbar } from "../../components/Navbar/Navbar";
 import { Post } from "../../components/User/Post";
 import { useAuth } from "../../context/AuthContext";
@@ -27,19 +26,21 @@ import { db, storage } from "../../firebase";
 import { IPost } from "../../types/post";
 import { IUserData } from "../../types/userData";
 
-interface IProfileProps {}
-
-export const Profile: React.FC<IProfileProps> = ({}) => {
+export const Profile: React.FC = () => {
   const { user: currentUser } = useAuth();
   const { userData, setUserData } = useUserData();
 
-  const [user, setUser] = useState<IUserData>();
-  const [foundUser, setFoundUser] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [uploadedAvatar, setUploadedAvater] = useState(false);
+  const [profile, setProfile] = useState<{
+    id: string;
+    data: IUserData | null;
+  } | null>(null);
 
   const [posts, setPosts] = useState<IPost[]>();
   const router = useRouter();
+  const profileId = typeof router.query.id === "string" ? router.query.id : "";
+  const user = profile?.id === profileId ? profile.data : null;
+  const foundUser = Boolean(user);
+  const loading = !profileId || profile?.id !== profileId;
 
   const filePickerRef = useRef<HTMLInputElement>(null);
 
@@ -55,13 +56,13 @@ export const Profile: React.FC<IProfileProps> = ({}) => {
         if (currentUser) {
           const imageRef = storageRef(
             storage,
-            `avatars/${currentUser.uid}/image`
+            `avatars/${currentUser.uid}/image`,
           );
 
           await uploadString(
             imageRef,
             readerEvent.target?.result as string,
-            "data_url"
+            "data_url",
           );
 
           const downloadUrl = await getDownloadURL(imageRef);
@@ -70,141 +71,55 @@ export const Profile: React.FC<IProfileProps> = ({}) => {
 
           await updateDoc(doc(db, "users", currentUser.uid), {
             profilePicture: downloadUrl,
-          }).then((_doc) => {
-            setUploadedAvater(true);
           });
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error(error);
       }
     };
   };
 
-  const getUser = async () => {
-    const docRef = doc(db, `users/${router.query.id}`);
-
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-
-      const user = {
-        id: data.id,
-        displayName: data.displayName,
-        email: data.email,
-        followers: data.followers,
-        following: data.following,
-        fullName: data.fullName,
-        profilePicture: data.profilePicture,
-        uid: data.uid,
-        username: data.username,
-      };
-
-      setUser(user);
-      setFoundUser(true);
-      setLoading(false);
-    } else {
-      setLoading(false);
-      setFoundUser(false);
-      // doc.data() will be undefined in this case
-      console.log("No such document!");
-    }
-    setUploadedAvater(false);
-  };
-
-  async function getUsersPosts() {
-    const unSub = onSnapshot(
-      query(collection(db, "posts"), where("uid", "==", router.query.id)),
-      (querySnapshot) => {
-        const documents = querySnapshot.docs.map((doc) => {
-          const data: any = {
-            ...doc.data(),
-            id: doc.id,
-          };
-          return {
-            id: data.id,
-            caption: data.caption,
-            image: data.image,
-            location: data.location,
-            timestamp: data.timestamp,
-            uid: data.uid,
-            userAvatar: data.userAvatar,
-            username: data.username,
-          };
+  useEffect(() => {
+    if (!profileId) return;
+    const stopProfile = onSnapshot(
+      doc(db, "users", profileId),
+      (snapshot) => {
+        setProfile({
+          id: profileId,
+          data: snapshot.exists()
+            ? ({ ...snapshot.data(), id: snapshot.id } as IUserData)
+            : null,
         });
-        setPosts(documents);
-      }
+      },
+      () => setProfile({ id: profileId, data: null }),
     );
-
-    return unSub;
-  }
-
-  async function updateLoggedInUserFollowing(userToFolllowId: string) {
-    if (currentUser) {
-      await updateDoc(doc(db, "users", currentUser.uid), {
-        following: userData.following.includes(userToFolllowId)
-          ? arrayRemove(userToFolllowId)
-          : arrayUnion(userToFolllowId),
-      });
-    }
-  }
-
-  async function updateFollowedUserFollowers(userFolllowedId: string) {
-    if (currentUser) {
-      await updateDoc(doc(db, "users", userFolllowedId), {
-        followers: userData.following.includes(userFolllowedId)
-          ? arrayRemove(currentUser.uid)
-          : arrayUnion(currentUser.uid),
-      });
-    }
-  }
+    const stopPosts = onSnapshot(
+      query(collection(db, "posts"), where("uid", "==", profileId)),
+      (snapshot) =>
+        setPosts(
+          snapshot.docs.map(
+            (post) => ({ ...post.data(), id: post.id }) as IPost,
+          ),
+        ),
+      () => setPosts([]),
+    );
+    return () => {
+      stopProfile();
+      stopPosts();
+    };
+  }, [profileId]);
 
   const handleFollowUser = async (userId: string) => {
-    await updateLoggedInUserFollowing(userId);
-
-    await updateFollowedUserFollowers(userId);
-
-    const isFollowingUser = userData.following.includes(userId);
-
-    if (currentUser) {
-      setUserData((prev) => ({
-        ...prev,
-        followers: isFollowingUser
-          ? prev.followers.filter(
-              (followingId: string) => followingId !== currentUser.uid
-            )
-          : [...prev.followers, currentUser.uid],
-      }));
-
-      setUserData((prev) => ({
-        ...prev,
-        following: isFollowingUser
-          ? prev.following.filter(
-              (followingId: string) => followingId !== userId
-            )
-          : [...prev.following, userId],
-      }));
-    }
+    if (!currentUser) return;
+    const isFollowing = userData.following.includes(userId);
+    await toggleFollowing(currentUser.uid, userId, isFollowing);
+    setUserData((previous) => ({
+      ...previous,
+      following: isFollowing
+        ? previous.following.filter((id) => id !== userId)
+        : [...new Set([...previous.following, userId])],
+    }));
   };
-
-  useEffect(() => {
-    getUser();
-    getUsersPosts();
-  }, [router.query.id]);
-
-  useEffect(() => {
-    getUser();
-  }, [userData]);
-
-  useEffect(() => {
-    getUsersPosts();
-  }, [foundUser]);
-
-  useEffect(() => {
-    if (uploadedAvatar) {
-      getUser();
-    }
-  }, [uploadedAvatar]);
 
   // Get user data from Firebase using userId from URL
   // if no userId then return page not found
@@ -221,15 +136,7 @@ export const Profile: React.FC<IProfileProps> = ({}) => {
         </Head>
         <Navbar />
         <div className="flex justify-center mt-10">
-          <Oval
-            ariaLabel="loading-indicator"
-            height={100}
-            width={100}
-            strokeWidth={5}
-            strokeWidthSecondary={1}
-            color="blue"
-            secondaryColor="white"
-          />
+          <Spinner />
         </div>
       </div>
     );
@@ -250,7 +157,10 @@ export const Profile: React.FC<IProfileProps> = ({}) => {
             <header className="flex flex-wrap items-center p-4 md:py-8">
               <div className="md:w-3/12 md:ml-16">
                 <div className="relative w-20 h-20 md:w-40 md:h-40">
-                  <img
+                  <Image
+                    unoptimized
+                    width={1024}
+                    height={1024}
                     className="w-20 h-20 md:w-40 md:h-40 object-cover rounded-full"
                     src={
                       (user?.profilePicture as string)
@@ -331,7 +241,7 @@ export const Profile: React.FC<IProfileProps> = ({}) => {
                   {currentUser.uid === router.query.id ? (
                     <div className="mt-1 xs:mt-0 flex items-center space-x-4">
                       <div>
-                        <button className="bg-transparent border text-black px-3 py-1 font-semibold text-sm rounded text-center sm:inline-block block">
+                        <button className="bg-transparent border text-black px-3 py-1 font-semibold text-sm rounded-sm text-center sm:inline-block block">
                           Edit profile
                         </button>
                       </div>
@@ -369,7 +279,7 @@ export const Profile: React.FC<IProfileProps> = ({}) => {
                     <div className="xs:ml-6 mt-1 xs:mt-0 flex items-center space-x-2">
                       <div>
                         {userData.following.includes(
-                          router.query.id as string
+                          router.query.id as string,
                         ) ? (
                           <button
                             onClick={() =>

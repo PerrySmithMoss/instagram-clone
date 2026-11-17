@@ -1,87 +1,45 @@
+import { getSuggestedUsers, toggleFollowing } from "../../../lib/social";
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import {
-  arrayRemove,
-  arrayUnion,
-  collection,
-  doc,
-  FieldValue,
-  getDocs,
-  limit,
-  query,
-  updateDoc,
-  where,
-} from "firebase/firestore";
-import { db } from "../../../firebase";
 import { useAuth } from "../../../context/AuthContext";
 import { useUserData } from "../../../context/UserContext";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { IUserData } from "../../../types/userData";
 
-interface ISuggestionsProps {}
-
-export const Suggestions: React.FC<ISuggestionsProps> = ({}) => {
+export const Suggestions: React.FC = () => {
   const [suggestions, setSuggestions] = useState<IUserData[]>([]);
   const { user } = useAuth();
   const { userData, setUserData } = useUserData();
   const router = useRouter();
 
-  async function getUsers() {
-    if (user) {
-      const doc = query(
-        collection(db, "users"),
-        userData.following.length > 0
-          ? where("uid", "not-in", [...userData.following, user.uid])
-          : where("uid", "!=", user.uid),
-        limit(5)
-      );
-
-      getDocs(doc).then((querySnapshot) => {
-        let values: any = [];
-        querySnapshot.forEach((doc) => {
-          let data = {
-            ...doc.data(),
-            id: doc.id,
-          };
-          values.push(data);
-        });
-        setSuggestions(values);
-      });
-    }
-  }
-
-  async function updateLoggedInUserFollowing(userToFolllowId: string) {
-    if (user) {
-      await updateDoc(doc(db, "users", user?.uid), {
-        following: userData.following.includes(userToFolllowId)
-          ? arrayRemove(userToFolllowId)
-          : arrayUnion(userToFolllowId),
-      });
-    }
-  }
-
-  async function updateFollowedUserFollowers(userFolllowedId: string) {
-    await updateDoc(doc(db, "users", userFolllowedId), {
-      followers: userData.following.includes(userFolllowedId)
-        ? arrayRemove(user?.uid)
-        : arrayUnion(user?.uid),
-    });
-  }
-
-  const handleFollowUser = async (userId: string) => {
-    await updateLoggedInUserFollowing(userId);
-
-    await updateFollowedUserFollowers(userId);
-
-    setUserData((prev) => ({
-      ...prev,
-      following: [...prev.following, userId],
-    }));
-  };
+  const uid = user?.uid ?? "";
+  const following = userData.following;
 
   useEffect(() => {
-    getUsers();
-  }, [userData]);
+    let active = true;
+    getSuggestedUsers(uid, following, 5)
+      .then((users) => {
+        if (active) setSuggestions(users);
+      })
+      .catch(() => {
+        if (active) setSuggestions([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, [uid, following]);
+
+  const handleFollowUser = async (userId: string) => {
+    const isFollowing = following.includes(userId);
+    await toggleFollowing(uid, userId, isFollowing);
+    setUserData((previous) => ({
+      ...previous,
+      following: isFollowing
+        ? previous.following.filter((id) => id !== userId)
+        : [...new Set([...previous.following, userId])],
+    }));
+  };
 
   return (
     <>
@@ -108,8 +66,11 @@ export const Suggestions: React.FC<ISuggestionsProps> = ({}) => {
               key={user.uid}
               className="flex items-center justify-between mt-3"
             >
-              <Link legacyBehavior href={`/user/${user.uid}`}>
-                <img
+              <Link href={`/user/${user.uid}`} className="contents">
+                <Image
+                  unoptimized
+                  width={1024}
+                  height={1024}
                   src={
                     user.profilePicture
                       ? user.profilePicture
@@ -120,7 +81,7 @@ export const Suggestions: React.FC<ISuggestionsProps> = ({}) => {
                 />
               </Link>
               <div className="flex-1 ml-4">
-                <Link legacyBehavior href={`/user/${user.uid}`}>
+                <Link href={`/user/${user.uid}`} className="contents">
                   <h2 className="font-semibold text-sm cursor-pointer">
                     {user.username}
                   </h2>

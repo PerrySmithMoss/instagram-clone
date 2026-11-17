@@ -1,4 +1,5 @@
-import React, { RefObject, useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import React, { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import CreatePostModalStyles from "./CreatePostModal.module.css";
 import { useAuth } from "../../../context/AuthContext";
@@ -32,9 +33,6 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
 }) => {
   const { user } = useAuth();
   const { userData } = useUserData();
-
-  const ref = useRef<any>(null);
-  const [mounted, setMounted] = useState(false);
 
   const [selectedFile, setSelectedFile] = useState<
     string | ArrayBuffer | null | undefined
@@ -83,19 +81,16 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
       onClose();
       setSelectedFile(null);
-    } catch (error: any) {
-        console.error(error);
+    } catch (error: unknown) {
+      console.error(error);
     }
   };
 
-  useEffect(() => {
-    ref.current = document.querySelector(`#${selector}`);
-    setMounted(true);
-  }, [selector]);
-
   if (!open) return null;
+  const container =
+    typeof document === "undefined" ? null : document.getElementById(selector);
 
-  return mounted
+  return container
     ? createPortal(
         <div
           className={`${CreatePostModalStyles.modalBackdrop}`}
@@ -193,7 +188,10 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                 {selectedFile ? (
                   <div className="grid grid-cols-2 max-w-4xl h-full">
                     <div className=" object-cover overflow-hidden">
-                      <img
+                      <Image
+                        unoptimized
+                        width={1024}
+                        height={1024}
                         src={selectedFile as string}
                         className="overflow-hidden object-cover rounded-bl-xl  h-full w-full"
                         alt="Selected File Image"
@@ -202,15 +200,18 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                     <div className="mt-4 overflow-y-scroll">
                       <div className="flex content-center items-center mx-2">
                         <div>
-                          <img
+                          <Image
+                            unoptimized
+                            width={1024}
+                            height={1024}
                             className="rounded-full w-8 h-8"
                             alt="User's avatar"
                             src={
                               user?.photoURL
-                              ? user?.photoURL
-                              : userData?.profilePicture
-                              ? userData?.profilePicture
-                              : "/assets/image/Navbar/default_profile_pic.jpeg"
+                                ? user?.photoURL
+                                : userData?.profilePicture
+                                  ? userData?.profilePicture
+                                  : "/assets/image/Navbar/default_profile_pic.jpeg"
                             }
                           />
                         </div>
@@ -224,10 +225,10 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                             type="text"
                             value={postCaption}
                             onChange={(
-                              e: React.ChangeEvent<HTMLInputElement>
+                              e: React.ChangeEvent<HTMLInputElement>,
                             ) => setPostCaption(e.target.value)}
                             placeholder="Write a caption..."
-                            className=" h-6 outline-none"
+                            className=" h-6 outline-hidden"
                           />
                         </div>
                         <div className="flex justify-between pb-2 mx-4">
@@ -254,10 +255,10 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                               type="text"
                               value={postLocation}
                               onChange={(
-                                e: React.ChangeEvent<HTMLInputElement>
+                                e: React.ChangeEvent<HTMLInputElement>,
                               ) => setPostLocation(e.target.value)}
                               placeholder="Add Location"
-                              className="text-gray-700 outline-none"
+                              className="text-gray-700 outline-hidden"
                             />
                           </div>
                           <div>
@@ -313,7 +314,10 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                                 choose to write your own.
                               </p>
                               <div className="flex content-center items-center pt-2.5 pb-5">
-                                <img
+                                <Image
+                                  unoptimized
+                                  width={1024}
+                                  height={1024}
                                   src={selectedFile as string}
                                   className=" h-12 w-12"
                                   alt="User uploaded photo"
@@ -322,9 +326,9 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                                   type="text"
                                   value={accessibilityText}
                                   onChange={(
-                                    e: React.ChangeEvent<HTMLInputElement>
+                                    e: React.ChangeEvent<HTMLInputElement>,
                                   ) => setAccessibilityText(e.target.value)}
-                                  className="border ml-3 flex-grow rounded-lg px-3 py-3"
+                                  className="border ml-3 grow rounded-lg px-3 py-3"
                                   placeholder="Write alt text"
                                 />
                               </div>
@@ -367,7 +371,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                           {isAdvancedSettingsOpen && (
                             <div className="">
                               <div className="flex content-center items-center pt-1">
-                                <div className=" flex-grow">
+                                <div className=" grow">
                                   <span>Turn off commenting</span>
                                 </div>
                                 <div className="flex justify-end">
@@ -377,7 +381,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
                                       checked={isTurnOffCommentingTrue}
                                       onChange={() =>
                                         setIsTurnOffCommentingTrue(
-                                          !isTurnOffCommentingTrue
+                                          !isTurnOffCommentingTrue,
                                         )
                                       }
                                       name="toggle"
@@ -446,7 +450,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({
             </div>
           </div>
         </div>,
-        ref.current
+        container,
       )
     : null;
 };

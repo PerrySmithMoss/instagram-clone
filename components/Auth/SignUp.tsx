@@ -1,12 +1,11 @@
+import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import AuthStyles from "./auth.module.css";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/router";
 
-interface ISignUpProps {}
-
-export const SignUp: React.FC<ISignUpProps> = () => {
+export const SignUp: React.FC = () => {
   const { signUp, signUpWithGoogle, signUpWithFacebook } = useAuth();
   const [userInputDetails, setUserInputDetails] = useState({
     email: "",
@@ -26,7 +25,7 @@ export const SignUp: React.FC<ISignUpProps> = () => {
   };
 
   const handleSignUp = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.preventDefault();
 
@@ -46,7 +45,7 @@ export const SignUp: React.FC<ISignUpProps> = () => {
   };
 
   const handleSignUpWithGoogle = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.preventDefault();
 
@@ -60,7 +59,7 @@ export const SignUp: React.FC<ISignUpProps> = () => {
   };
 
   const handleSignUpWithFacebook = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     e.preventDefault();
 
@@ -77,8 +76,8 @@ export const SignUp: React.FC<ISignUpProps> = () => {
     <div className=" items-stretch flex shrink-0 m-0 p-0 relative h-full">
       <section className=" min-h-screen overflow-hidden flex flex-col grow">
         <main className="bg-[#fafafa] grow order-4 flex">
-          <article className="flex flex-row flex-grow justify-center items-center mt-[32px] mx-auto mb-0 max-w-[935px] w-full pb-[32px]">
-            <div className="flex flex-col flex-grow justify-center items-center content-center mt-4 max-w-sm  pb-5">
+          <article className="flex flex-row grow justify-center items-center mt-[32px] mx-auto mb-0 max-w-[935px] w-full pb-[32px]">
+            <div className="flex flex-col grow justify-center items-center content-center mt-4 max-w-sm  pb-5">
               <div className={`${AuthStyles.formBorder} max-w-sm w-full pt-4`}>
                 <div className="flex justify-center mx-auto mt-6 mb-3">
                   <svg
@@ -102,7 +101,7 @@ export const SignUp: React.FC<ISignUpProps> = () => {
                 <div className="py-3 mx-10">
                   <button
                     onClick={(e) => handleSignUpWithFacebook(e)}
-                    className="flex cursor-pointer items-center shadow rounded-sm space-x-2 hover:shadow-md bg-[#0095f6] w-full justify-center text-white py-1.5"
+                    className="flex cursor-pointer items-center shadow-sm rounded-xs space-x-2 hover:shadow-md bg-[#0095f6] w-full justify-center text-white py-1.5"
                   >
                     <svg
                       version="1.1"
@@ -150,7 +149,7 @@ export const SignUp: React.FC<ISignUpProps> = () => {
                 <div className="pb-3 mx-10">
                   <button
                     onClick={(e) => handleSignUpWithGoogle(e)}
-                    className="flex cursor-pointer items-center hover:shadow-md rounded-sm space-x-2 outline-none text-gray-600 w-full justify-center shadow py-1.5"
+                    className="flex cursor-pointer items-center hover:shadow-md rounded-xs space-x-2 outline-hidden text-gray-600 w-full justify-center shadow-sm py-1.5"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -192,7 +191,7 @@ export const SignUp: React.FC<ISignUpProps> = () => {
                   <form method="post">
                     <div className=" mx-10">
                       <input
-                        className={`border text-xs bg-gray-50 appearance-none rounded w-full pl-2 py-2 focus:border-gray-400 focus:outline-none active:outline-none active:border-gray-400 autofocus`}
+                        className={`border text-xs bg-gray-50 appearance-none rounded-sm w-full pl-2 py-2 focus:border-gray-400 focus:outline-hidden active:outline-hidden active:border-gray-400 autofocus`}
                         type="text"
                         aria-label="email"
                         placeholder="Email"
@@ -208,7 +207,7 @@ export const SignUp: React.FC<ISignUpProps> = () => {
                     </div>
                     <div className="pt-1.5 mx-10">
                       <input
-                        className={`border text-xs bg-gray-50 appearance-none rounded w-full pl-2 py-2 focus:border-gray-400 focus:outline-none active:outline-none active:border-gray-400 autofocus`}
+                        className={`border text-xs bg-gray-50 appearance-none rounded-sm w-full pl-2 py-2 focus:border-gray-400 focus:outline-hidden active:outline-hidden active:border-gray-400 autofocus`}
                         aria-label="full name"
                         aria-required={true}
                         placeholder="Full name"
@@ -223,7 +222,7 @@ export const SignUp: React.FC<ISignUpProps> = () => {
                     </div>
                     <div className="pt-1.5 mx-10">
                       <input
-                        className={`border text-xs bg-gray-50 appearance-none rounded w-full pl-2 py-2 focus:border-gray-400 focus:outline-none active:outline-none active:border-gray-400 autofocus`}
+                        className={`border text-xs bg-gray-50 appearance-none rounded-sm w-full pl-2 py-2 focus:border-gray-400 focus:outline-hidden active:outline-hidden active:border-gray-400 autofocus`}
                         aria-label="username"
                         autoCapitalize="off"
                         aria-required={true}
@@ -239,7 +238,7 @@ export const SignUp: React.FC<ISignUpProps> = () => {
                     </div>
                     <div className="pt-1.5 mx-10">
                       <input
-                        className={`border text-xs bg-gray-50 appearance-none rounded w-full pl-2 py-2 focus:border-gray-400 focus:outline-none active:outline-none active:border-gray-400 autofocus`}
+                        className={`border text-xs bg-gray-50 appearance-none rounded-sm w-full pl-2 py-2 focus:border-gray-400 focus:outline-hidden active:outline-hidden active:border-gray-400 autofocus`}
                         aria-label="password"
                         maxLength={100}
                         autoCapitalize="off"
@@ -262,9 +261,9 @@ export const SignUp: React.FC<ISignUpProps> = () => {
                       <button
                         onClick={(e) => handleSignUp(e)}
                         disabled={
-                          !userInputDetails.email &&
-                          !userInputDetails.fullName &&
-                          !userInputDetails.password &&
+                          !userInputDetails.email.trim() ||
+                          !userInputDetails.fullName.trim() ||
+                          !userInputDetails.username.trim() ||
                           !userInputDetails.password
                         }
                         className={
@@ -272,8 +271,8 @@ export const SignUp: React.FC<ISignUpProps> = () => {
                           userInputDetails.fullName.length > 0 &&
                           userInputDetails.password.length > 0 &&
                           userInputDetails.username.length > 0
-                            ? `bg-[#0095f6] rounded-sm text-sm  w-full text-white py-1.5`
-                            : ` cursor-default bg-[#0095f6] opacity-[0.32] rounded-sm text-sm  w-full text-white py-1.5`
+                            ? `bg-[#0095f6] rounded-xs text-sm  w-full text-white py-1.5`
+                            : ` cursor-default bg-[#0095f6] opacity-[0.32] rounded-xs text-sm  w-full text-white py-1.5`
                         }
                       >
                         Sign up
@@ -335,7 +334,7 @@ export const SignUp: React.FC<ISignUpProps> = () => {
                 <div className="flex justify-center py-5">
                   <p className=" text-sm text-[#262626]">
                     Have an account?{" "}
-                    <Link legacyBehavior href="/">
+                    <Link href="/" className="contents">
                       <span className="cursor-pointer text-[#0095f6] hover:text-blue-500 font-semibold">
                         Log in
                       </span>
@@ -354,8 +353,11 @@ export const SignUp: React.FC<ISignUpProps> = () => {
                       rel="noopener noreferrer"
                       href="https://itunes.apple.com/app/instagram/id389801252?pt=428156&ct=igweb.loginPage.badge&mt=8&vt=lo"
                     >
-                      <img
-                        className="h-10"
+                      <Image
+                        unoptimized
+                        width={1024}
+                        height={1024}
+                        className="h-10 w-auto"
                         src="/assets/image/Login/download-app.png"
                         alt="Download from Apple App Store"
                       />
@@ -367,8 +369,11 @@ export const SignUp: React.FC<ISignUpProps> = () => {
                       rel="noopener noreferrer"
                       href="https://play.google.com/store/apps/details?id=com.instagram.android&referrer=utm_source%3Dinstagramweb%26utm_campaign%3DloginPage%26ig_mid%3D8146E8C7-CD43-4F34-AC25-D96B41D52CB1%26utm_content%3Dlo%26utm_medium%3Dbadge"
                     >
-                      <img
-                        className=" h-10"
+                      <Image
+                        unoptimized
+                        width={1024}
+                        height={1024}
+                        className=" h-10 w-auto"
                         src="/assets/image/Login/download-app2.png"
                         alt="Download from Google Play Store"
                       />
@@ -380,8 +385,8 @@ export const SignUp: React.FC<ISignUpProps> = () => {
           </article>
         </main>
         <footer className="order-5 py-0 px-5 items-stretch flex flex-col shrink-0 m-0 relative bg-[#fafafa]">
-          <div className="flex text-[#8e8e8e] font-normal text-[12px] flex-grow-0 shrink-0 basis-0 items-stretch m-0 relative p-0 flex-col mb-[52px]">
-            <div className="flex pb-1.5 flex-grow-0 shrink-0 basis-auto content-start flex-col items-stretch">
+          <div className="flex text-[#8e8e8e] font-normal text-[12px] grow-0 shrink-0 basis-0 items-stretch m-0 relative p-0 flex-col mb-[52px]">
+            <div className="flex pb-1.5 grow-0 shrink-0 basis-auto content-start flex-col items-stretch">
               <div className=" flex-wrap space-x-4 grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
                 <div className="flex-wrap grow-0 shrink-0 basis-auto justify-center flex-row items-stretch flex">
                   <a>
@@ -540,10 +545,3 @@ export const SignUp: React.FC<ISignUpProps> = () => {
     </div>
   );
 };
-
-const images = [
-  "/assets/image/Login/image1.png",
-  "/assets/image/Login/image2.png",
-  "/assets/image/Login/image3.png",
-  "/assets/image/Login/image4.png",
-];

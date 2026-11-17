@@ -24,13 +24,14 @@ export const CommentUnderPost: React.FC<ICommentUnderPostProps> = ({
 }) => {
   const { user } = useAuth();
   const [likes, setLikes] = useState<ILike[]>([]);
-  const [hasLikedComment, setHasLikedComment] = useState(false);
+
+  const hasLikedComment = likes.some((like) => like.id === user?.uid);
 
   async function handleLikeComment() {
     if (hasLikedComment) {
       if (user) {
         await deleteDoc(
-          doc(db, "posts", postId, "comments", comment.id, "likes", user.uid)
+          doc(db, "posts", postId, "comments", comment.id, "likes", user.uid),
         );
       }
     } else {
@@ -40,7 +41,7 @@ export const CommentUnderPost: React.FC<ICommentUnderPostProps> = ({
           {
             username: user?.displayName,
             userAvatar: user?.photoURL,
-          }
+          },
         );
       }
     }
@@ -51,10 +52,10 @@ export const CommentUnderPost: React.FC<ICommentUnderPostProps> = ({
       query(collection(db, `/posts/${postId}/comments/${comment.id}/likes`)),
       (querySnapshot) => {
         const documents = querySnapshot.docs.map((doc) => {
-          const data: any = {
+          const data = {
             ...doc.data(),
             id: doc.id,
-          };
+          } as ILike;
           return {
             username: data.username,
             userAvatar: data.userAvatar,
@@ -62,19 +63,12 @@ export const CommentUnderPost: React.FC<ICommentUnderPostProps> = ({
           };
         });
         setLikes(documents);
-      }
+      },
     );
 
     return () => unSub();
-  }, [db, comment.id, postId]);
+  }, [comment.id, postId]);
 
-  useEffect(
-    () =>
-      setHasLikedComment(
-        likes.findIndex((like) => like.id === user?.uid) !== -1
-      ),
-    [likes]
-  );
   return (
     <div className="flex justify-between items-center space-x-1 mt-0.5">
       <div>

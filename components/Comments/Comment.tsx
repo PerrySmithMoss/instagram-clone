@@ -1,3 +1,4 @@
+import Image from "next/image";
 import {
   collection,
   deleteDoc,
@@ -18,7 +19,7 @@ import { ILike } from "../../types/like";
 interface ICommentProps {
   postId: string;
   comment: IComment;
-  commentInputRef: React.MutableRefObject<HTMLInputElement | null>;
+  commentInputRef: React.RefObject<HTMLInputElement | null>;
   setModalComment: (value: string) => void;
   setIsReply: React.Dispatch<React.SetStateAction<boolean>>;
   setReplyToCommentId: React.Dispatch<React.SetStateAction<string>>;
@@ -36,13 +37,14 @@ export const Comment: React.FC<ICommentProps> = ({
   const [likes, setLikes] = useState<ILike[]>([]);
   const [commentReplies, setCommentReplies] = useState<IComment[]>([]);
   const [showComments, setShowComments] = useState(false);
-  const [hasLikedComment, setHasLikedComment] = useState(false);
+
+  const hasLikedComment = likes.some((like) => like.id === user?.uid);
 
   async function handleLikeComment() {
     if (hasLikedComment) {
       if (user) {
         await deleteDoc(
-          doc(db, "posts", postId, "comments", comment.id, "likes", user.uid)
+          doc(db, "posts", postId, "comments", comment.id, "likes", user.uid),
         );
       }
     } else {
@@ -52,7 +54,7 @@ export const Comment: React.FC<ICommentProps> = ({
           {
             username: user?.displayName,
             userAvatar: user?.photoURL,
-          }
+          },
         );
       }
     }
@@ -73,10 +75,10 @@ export const Comment: React.FC<ICommentProps> = ({
       query(collection(db, `/posts/${postId}/comments/${comment.id}/likes`)),
       (querySnapshot) => {
         const documents = querySnapshot.docs.map((doc) => {
-          const data: any = {
+          const data = {
             ...doc.data(),
             id: doc.id,
-          };
+          } as ILike;
           return {
             username: data.username,
             userAvatar: data.userAvatar,
@@ -84,21 +86,21 @@ export const Comment: React.FC<ICommentProps> = ({
           };
         });
         setLikes(documents);
-      }
+      },
     );
 
     return () => unSub();
-  }, [db, comment.id, postId]);
+  }, [comment.id, postId]);
 
   useEffect(() => {
     const unSub = onSnapshot(
       query(collection(db, `/posts/${postId}/comments/${comment.id}/comments`)),
       (querySnapshot) => {
         const documents = querySnapshot.docs.map((doc) => {
-          const data: any = {
+          const data = {
             ...doc.data(),
             id: doc.id,
-          };
+          } as IComment;
           return {
             comment: data.comment,
             id: data.id,
@@ -109,19 +111,11 @@ export const Comment: React.FC<ICommentProps> = ({
           };
         });
         setCommentReplies(documents);
-      }
+      },
     );
 
     return () => unSub();
-  }, [db, comment.id, postId]);
-
-  useEffect(
-    () =>
-      setHasLikedComment(
-        likes.findIndex((like) => like.id === user?.uid) !== -1
-      ),
-    [likes]
-  );
+  }, [comment.id, postId]);
 
   // console.log("comments: ", commentReplies);
   return (
@@ -129,10 +123,10 @@ export const Comment: React.FC<ICommentProps> = ({
       <div
         role="button"
         tabIndex={0}
-        className="flex flex-col items-stretch flex-shrink-0 m-0 p-0 relative"
+        className="flex flex-col items-stretch shrink-0 m-0 p-0 relative"
       >
         <li className="pb-0 overflow-visible py-[12px] px-0 w-auto list-none list-item relative mt-[-5px] mr-[-2px]">
-          <div className=" items-start flex flex-row flex-shrink-0 justify-between m-0 p-0 relative">
+          <div className=" items-start flex flex-row shrink-0 justify-between m-0 p-0 relative">
             <div className="flex flex-row w-full">
               <div className={`block ${styles.postUserAvatar} pr-2 relative`}>
                 <div
@@ -141,7 +135,10 @@ export const Comment: React.FC<ICommentProps> = ({
                   className="block justify-center relative flex-none items-start"
                 >
                   <a className="w-[38px] h-[38px] flex flex-col min-w-0 rounded-full overflow-hidden p-0 m-0 relative">
-                    <img
+                    <Image
+                      unoptimized
+                      width={1024}
+                      height={1024}
                       className="rounded-full w-10 h-10"
                       alt="User's avatar"
                       src={
@@ -153,7 +150,7 @@ export const Comment: React.FC<ICommentProps> = ({
                   </a>
                 </div>
               </div>
-              <div className=" leading-[18px] items-stretch border-0 inline-block p-0 flex-shrink m-0 min-w-0 flex-col">
+              <div className=" leading-[18px] items-stretch border-0 inline-block p-0 shrink m-0 min-w-0 flex-col">
                 <h2 tabIndex={-1} className="text-sm items-center inline-flex">
                   <div className="flex relative items-stretch flex-col mr-1">
                     <span className="inline relative">
@@ -249,7 +246,7 @@ export const Comment: React.FC<ICommentProps> = ({
                     onClick={() => setShowComments(!showComments)}
                     className="text-center flex items-center"
                   >
-                    <div className="flex-shrink-0 flex-col h-0 mr-4 border-0 border-b border-b-gray-400 items-stretch inline-block w-[24px]"></div>
+                    <div className="shrink-0 flex-col h-0 mr-4 border-0 border-b border-b-gray-400 items-stretch inline-block w-[24px]"></div>
                     {showComments ? (
                       <div className="text-xs text-gray-400 font-medium align-baseline  mb-0.5">
                         Hide replies

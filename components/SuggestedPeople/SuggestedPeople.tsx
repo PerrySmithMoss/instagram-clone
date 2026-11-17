@@ -1,89 +1,48 @@
-import {
-  query,
-  collection,
-  where,
-  limit,
-  getDocs,
-  updateDoc,
-  arrayRemove,
-  arrayUnion,
-  doc,
-} from "firebase/firestore";
+import { getSuggestedUsers, toggleFollowing } from "../../lib/social";
+import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useUserData } from "../../context/UserContext";
-import { db } from "../../firebase";
 import { IUserData } from "../../types/userData";
 
-interface ISuggestedPeopleProps {}
-
-export const SuggestedPeople: React.FC<ISuggestedPeopleProps> = ({}) => {
+export const SuggestedPeople: React.FC = () => {
   const { user } = useAuth();
   const [suggestions, setSuggestions] = useState<IUserData[]>([]);
   const { userData, setUserData } = useUserData();
 
-  async function getUsers() {
-    const doc = query(
-      collection(db, "users"),
-      userData.following.length > 0
-        ? where("uid", "not-in", [...userData.following, user?.uid])
-        : where("uid", "!=", user?.uid),
-      limit(20)
-    );
-
-    getDocs(doc).then((querySnapshot) => {
-      let values: any = [];
-      querySnapshot.forEach((doc) => {
-        let data = {
-          ...doc.data(),
-          id: doc.id,
-        };
-        values.push(data);
-      });
-      setSuggestions(values);
-    });
-  }
-
-  async function updateLoggedInUserFollowing(userToFolllowId: string) {
-    if (user) {
-      await updateDoc(doc(db, "users", user.uid), {
-        following: userData.following.includes(userToFolllowId)
-          ? arrayRemove(userToFolllowId)
-          : arrayUnion(userToFolllowId),
-      });
-    }
-  }
-
-  async function updateFollowedUserFollowers(userFolllowedId: string) {
-    if (user) {
-      await updateDoc(doc(db, "users", userFolllowedId), {
-        followers: userData.following.includes(userFolllowedId)
-          ? arrayRemove(user.uid)
-          : arrayUnion(user.uid),
-      });
-    }
-  }
-
-  const handleFollowUser = async (userId: string) => {
-    await updateLoggedInUserFollowing(userId);
-
-    await updateFollowedUserFollowers(userId);
-
-    setUserData((prev: IUserData) => ({
-      ...prev,
-      following: [...prev.following, userId],
-    }));
-  };
+  const uid = user?.uid ?? "";
+  const following = userData.following;
 
   useEffect(() => {
-    getUsers();
-  }, [userData]);
+    let active = true;
+    getSuggestedUsers(uid, following, 20)
+      .then((users) => {
+        if (active) setSuggestions(users);
+      })
+      .catch(() => {
+        if (active) setSuggestions([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, [uid, following]);
+
+  const handleFollowUser = async (userId: string) => {
+    const isFollowing = following.includes(userId);
+    await toggleFollowing(uid, userId, isFollowing);
+    setUserData((previous) => ({
+      ...previous,
+      following: isFollowing
+        ? previous.following.filter((id) => id !== userId)
+        : [...new Set([...previous.following, userId])],
+    }));
+  };
 
   return (
     <section className="flex justify-center h-screen">
       <main className="flex flex-1 flex-col">
-        <div className="w-full relative px-3 max-w-[600px] my-0 mx-auto flex-grow flex-shrink-0 flex flex-col items-stretch py-0 sm:py-[40px]">
+        <div className="w-full relative px-3 max-w-[600px] my-0 mx-auto grow shrink-0 flex flex-col items-stretch py-0 sm:py-[40px]">
           <div className="my-3 px-1">
             <h1 className="text-lg font-medium">Suggested</h1>
           </div>
@@ -95,8 +54,11 @@ export const SuggestedPeople: React.FC<ISuggestedPeopleProps> = ({}) => {
                     key={suggestion.uid}
                     className="py-2 px-3 flex flex-row justify-start items-center relative"
                   >
-                    <Link legacyBehavior href={`/user/${suggestion.uid}`}>
-                      <img
+                    <Link href={`/user/${suggestion.uid}`} className="contents">
+                      <Image
+                        unoptimized
+                        width={1024}
+                        height={1024}
                         src={
                           suggestion?.profilePicture
                             ? suggestion?.profilePicture
@@ -107,7 +69,10 @@ export const SuggestedPeople: React.FC<ISuggestedPeopleProps> = ({}) => {
                       />
                     </Link>
                     <div className="flex-1 ml-4">
-                      <Link legacyBehavior href={`/user/${suggestion.uid}`}>
+                      <Link
+                        href={`/user/${suggestion.uid}`}
+                        className="contents"
+                      >
                         <h2 className="font-semibold cursor-pointer text-sm">
                           {suggestion.username}
                         </h2>
@@ -118,7 +83,7 @@ export const SuggestedPeople: React.FC<ISuggestedPeopleProps> = ({}) => {
                     </div>
                     <button
                       onClick={() => handleFollowUser(suggestion.uid)}
-                      className="text-xs bg-blue-500 cursor-pointer font-bold text-white px-4 py-2 rounded hover:bg-blue-600"
+                      className="text-xs bg-blue-500 cursor-pointer font-bold text-white px-4 py-2 rounded-sm hover:bg-blue-600"
                     >
                       Follow
                     </button>

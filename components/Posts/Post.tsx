@@ -1,7 +1,7 @@
+import Image from "next/image";
 import {
   addDoc,
   collection,
-  CollectionReference,
   deleteDoc,
   doc,
   onSnapshot,
@@ -41,7 +41,6 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
   const [replyToCommentId, setReplyToCommentId] = useState("");
 
   const [likes, setLikes] = useState<ILike[]>([]);
-  const [hasLikedPost, setHasLikedPost] = useState(false);
 
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
   const [visableComments, setVisableComments] = useState(5);
@@ -51,7 +50,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
   };
 
   const handleCommentInputKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>
+    e: React.KeyboardEvent<HTMLInputElement>,
   ) => {
     if (e.key === "Enter") {
       if (comment.length > 0) {
@@ -74,7 +73,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
   };
 
   const handleModalCommentInputKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>
+    e: React.KeyboardEvent<HTMLInputElement>,
   ) => {
     if (e.key === "Enter") {
       if (modalComment.length > 0) {
@@ -94,7 +93,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
           post.id,
           "comments",
           replyToCommentId,
-          "comments"
+          "comments",
         ),
         {
           comment: commentToSend,
@@ -102,7 +101,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
           username: user?.displayName,
           userAvatar: user?.photoURL,
           timestamp: serverTimestamp(),
-        }
+        },
       );
     } else {
       await addDoc(collection(db, "posts", post.id, "comments"), {
@@ -122,6 +121,8 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
   const handleLoadMoreComments = () => {
     setVisableComments((prevValue) => prevValue + 5);
   };
+
+  const hasLikedPost = likes.some((like) => like.id === user?.uid);
 
   async function likePost() {
     if (hasLikedPost) {
@@ -149,14 +150,14 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
     const unSub = onSnapshot(
       query(
         collection(db, "posts", post.id, "comments"),
-        orderBy("timestamp", "desc")
+        orderBy("timestamp", "desc"),
       ),
       (querySnapshot) => {
         const documents = querySnapshot.docs.map((doc) => {
-          const data: any = {
+          const data = {
             ...doc.data(),
             id: doc.id,
-          };
+          } as IComment;
           return {
             comment: data.comment,
             id: data.id,
@@ -167,21 +168,21 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
           };
         });
         setComments(documents);
-      }
+      },
     );
 
     return () => unSub();
-  }, [db, post.id]);
+  }, [post.id]);
 
   useEffect(() => {
     const unSub = onSnapshot(
       query(collection(db, "posts", post.id, "likes")),
       (querySnapshot) => {
         const documents = querySnapshot.docs.map((doc) => {
-          const data: any = {
+          const data = {
             ...doc.data(),
             id: doc.id,
-          };
+          } as ILike;
           return {
             username: data.username,
             userAvatar: data.userAvatar,
@@ -189,17 +190,11 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
           };
         });
         setLikes(documents);
-      }
+      },
     );
 
     return () => unSub();
-  }, [db, post.id]);
-
-  useEffect(
-    () =>
-      setHasLikedPost(likes.findIndex((like) => like.id === user?.uid) !== -1),
-    [likes]
-  );
+  }, [post.id]);
 
   return (
     <div className="bg-white my-7 border rounded-lg">
@@ -207,7 +202,10 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
         <div className="flex justify-between items-center p-2">
           <div className="flex items-center">
             <div>
-              <img
+              <Image
+                unoptimized
+                width={1024}
+                height={1024}
                 className="rounded-full h-10 w-10 border mr-3"
                 src={
                   (post.userAvatar as string)
@@ -261,7 +259,14 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
           </div>
         </div>
         {/* Post Image */}
-        <img className="object-cover w-full" src={post.image} alt="" />
+        <Image
+          unoptimized
+          width={1024}
+          height={1024}
+          className="object-cover w-full h-auto"
+          src={post.image}
+          alt=""
+        />
         {/* Buttons */}
         <div className="card-footer">
           <div className="top px-4 pt-4">
@@ -417,7 +422,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setComment(e.target.value)
                 }
-                className="text-sm h-10 ml-4 w-full outline-none focus:outline-none"
+                className="text-sm h-10 ml-4 w-full outline-hidden focus:outline-hidden"
                 placeholder="Add a comment..."
               />
               <button
@@ -441,7 +446,10 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
             {/* {selectedFile ? ( */}
             <div className="grid grid-cols-2 max-w-4xl h-full">
               <div className="h-full w-full object-cover overflow-hidden">
-                <img
+                <Image
+                  unoptimized
+                  width={1024}
+                  height={1024}
                   src={post.image}
                   className="overflow-hidden object-cover rounded-bl rounded-tl  h-full w-full"
                   alt="Selected File Image"
@@ -451,7 +459,10 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                 <div className="flex items-center justify-between pb-2">
                   <div className="flex content-center items-center mx-3">
                     <div>
-                      <img
+                      <Image
+                        unoptimized
+                        width={1024}
+                        height={1024}
                         className="rounded-full w-[42px] h-[42px]"
                         alt="User's avatar"
                         src={
@@ -482,7 +493,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                   </div>
                 </div>
 
-                <div className="p-0 flex-grow flex flex-col min-w-[335px] relative w-full">
+                <div className="p-0 grow flex flex-col min-w-[335px] relative w-full">
                   <section className="flex flex-row px-3 m-0 order-3 py-[6px]">
                     <span className="inline-block ">
                       <button className="items-center bg-transparent border-none cursor-pointer flex justify-center p-2">
@@ -597,7 +608,10 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                   <section className="block order-4 mb-1 px-4">
                     <div className="flex items-center space-x-1">
                       <div>
-                        <img
+                        <Image
+                          unoptimized
+                          width={1024}
+                          height={1024}
                           className="rounded-full w-8 h-8"
                           alt="User's avatar"
                           src={
@@ -618,21 +632,21 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                       </div>
                     </div>
                   </section>
-                  <div className="border-b order-1 overflow-x-hidden w-full flex flex-col flex-grow flex-shrink min-h-0 overflow-auto relative px-4">
+                  <div className="border-b order-1 overflow-x-hidden w-full flex flex-col grow shrink min-h-0 overflow-auto relative px-4">
                     <ul
-                      className={` border-0 flex-grow left-0 m-0 overflow-y-scroll pt-4 px-3 absolute list-none w-full`}
+                      className={` border-0 grow left-0 m-0 overflow-y-scroll pt-4 px-3 absolute list-none w-full`}
                     >
                       <div
                         role="button"
                         tabIndex={0}
-                        className="flex flex-col items-stretch flex-shrink-0 m-0 p-0 relative"
+                        className="flex flex-col items-stretch shrink-0 m-0 p-0 relative"
                       >
                         <li
                           role="menuitem"
-                          className="pt-1 pr-4 pb-4 w-auto overflow-visible relative -mr-[2px] -mt-[5px]"
+                          className="pt-1 pr-4 pb-4 w-auto overflow-visible relative mr-[-2px] mt-[-5px]"
                         >
                           <div
-                            className=" items-start border-0 flex flex-row flex-shrink-0 justify-between
+                            className=" items-start border-0 flex flex-row shrink-0 justify-between
                            m-0 p-0 relative"
                           >
                             <div className="w-full flex flex-row">
@@ -646,7 +660,10 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                                   className="block justify-center relative flex-none items-start"
                                 >
                                   <a className="w-[42px] h-[42px] flex flex-col min-w-0 rounded-full overflow-hidden p-0 m-0 relative">
-                                    <img
+                                    <Image
+                                      unoptimized
+                                      width={1024}
+                                      height={1024}
                                       className="rounded-full w-11 h-11"
                                       alt="User's avatar"
                                       src={
@@ -659,7 +676,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                                 </div>
                               </div>
                               {/* Post caption */}
-                              <div className="mt-1 leading-[18px] items-stretch border-0 inline-block p-0 flex-shrink m-0 min-w-0 flex-col">
+                              <div className="mt-1 leading-[18px] items-stretch border-0 inline-block p-0 shrink m-0 min-w-0 flex-col">
                                 <h2
                                   tabIndex={-1}
                                   className="text-sm items-center inline-flex"
@@ -809,7 +826,7 @@ export const Post: React.FC<IPostProps> = ({ post }) => {
                           //   setModalComment(e.target.value)
                           // }
                           onChange={(e) => handleAddComment(e.target.value)}
-                          className="bg-transparent text-sm border-0 flex h-[18px] flex-grow max-h-[80px] outline-none p-0 m-0 w-full resize-none max-w-full"
+                          className="bg-transparent text-sm border-0 flex h-[18px] grow max-h-[80px] outline-hidden p-0 m-0 w-full resize-none max-w-full"
                           autoComplete="off"
                           autoCorrect="off"
                         ></input>

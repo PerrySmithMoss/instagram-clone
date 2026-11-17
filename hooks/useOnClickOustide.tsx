@@ -3,8 +3,8 @@ import { useEffect } from "react";
 type Handler = (event: MouseEvent | TouchEvent) => void;
 
 export const useOnClickOutside = (
-  ref: React.RefObject<HTMLElement>,
-  handler: Handler
+  ref: React.RefObject<HTMLElement | null>,
+  handler: Handler,
 ) => {
   useEffect(
     () => {
@@ -28,6 +28,6 @@ export const useOnClickOutside = (
     // ... callback/cleanup to run every render. It's not a big deal ...
     // ... but to optimize you can wrap handler in useCallback before ...
     // ... passing it into this hook.
-    [ref, handler]
+    [ref, handler],
   );
 };

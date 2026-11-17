@@ -1,7 +1,7 @@
 import { Timestamp } from "firebase/firestore";
 
 export interface IPost {
-  id: string
+  id: string;
   caption: string;
   image: string;
   location: string;

@@ -1,3 +1,4 @@
+import { FirebaseError } from "firebase/app";
 import {
   createUserWithEmailAndPassword,
   FacebookAuthProvider,
@@ -8,12 +9,12 @@ import {
   signInWithPopup,
   signOut,
   updateProfile,
-  User,
-  UserCredential,
+  type User,
+  type UserCredential,
 } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
 import { createContext, useContext, useEffect, useState } from "react";
-import { auth, db } from "../firebase";
+import { auth } from "../firebase";
+import { ensureUserProfile } from "../lib/user-profile";
 
 interface IUserDetails {
   email: string;
@@ -21,25 +22,19 @@ interface IUserDetails {
   username: string;
   password: string;
 }
+
+interface SignUpResult {
+  error: boolean;
+  message: string;
+  action: string;
+}
+
 interface IAuthContext {
   user: User | null;
-  signUp: (userDetails: IUserDetails) => Promise<
-    | {
-        error: boolean;
-        messsge: string;
-        action: string;
-        message?: undefined;
-      }
-    | {
-        error: boolean;
-        message: any;
-        action: any;
-        messsge?: undefined;
-      }
-  >;
+  signUp: (details: IUserDetails) => Promise<SignUpResult>;
   logInWithEmailAndPassword: (
     email: string,
-    password: string
+    password: string,
   ) => Promise<UserCredential>;
   logOut: () => Promise<void>;
   signUpWithGoogle: () => Promise<void>;
@@ -47,147 +42,65 @@ interface IAuthContext {
   sendPasswordResetLink: (email: string) => Promise<void>;
 }
 
-const AuthContext = createContext<IAuthContext>({} as IAuthContext);
+const AuthContext = createContext<IAuthContext | undefined>(undefined);
 
 export const AuthContextProvider = ({
   children,
 }: {
   children: React.ReactNode;
-}): JSX.Element => {
+}) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
-    });
+  useEffect(
+    () =>
+      onAuthStateChanged(auth, (nextUser) => {
+        setUser(nextUser);
+        setLoading(false);
+      }),
+    [],
+  );
 
-    return () => unsubscribe();
-  }, []);
-
-  const signUp = async (userDetails: IUserDetails) => {
+  const signUp = async (details: IUserDetails): Promise<SignUpResult> => {
     try {
-      const res = await createUserWithEmailAndPassword(
+      const { user: createdUser } = await createUserWithEmailAndPassword(
         auth,
-        userDetails.email as string,
-        userDetails.password as string
+        details.email,
+        details.password,
       );
-
-      const user = res.user;
-
-      if (user) {
-        await updateProfile(user, { displayName: userDetails.username });
-
-        await setDoc(doc(db, "users", user.uid), {
-          uid: user.uid,
-          displayName: userDetails.username,
-          email: user.email,
-          profilePicture: null,
-          fullName: userDetails.fullName,
-          username: userDetails.username,
-          following: ["9apvkdI9ZhSm8Ot1NignmKlicR93"], // so user's have default posts on their feed. User can unfollow at anmy time.
-          followers: [],
-        });
-
-        return {
-          error: false,
-          message: "Success",
-          action: "User created successfully.",
-        };
-      } else {
-        return {
-          error: true,
-          message: "Unsuccessfull",
-          action: "Could not create user with specified email/password.",
-        };
-      }
-    } catch (error: any) {
-      if (error.code === "auth/email-already-in-use") {
-        console.error("That email address is already in use!");
-
-        return {
-          error: true,
-          message: "auth/email-already-in-use",
-          action: "Email address in use, please use another one.",
-        };
-      } else if (error.code === "auth/invalid-email") {
-        console.error("That email address is invalid!");
-
-        return {
-          error: true,
-          messsge: "auth/invalid-email",
-          action: "Invalid email, please use another one.",
-        };
-      } else {
-        console.error(error);
-
-        return {
-          error: true,
-          message: error,
-          action: error,
-        };
-      }
+      await updateProfile(createdUser, { displayName: details.username });
+      await ensureUserProfile(createdUser, details);
+      return {
+        error: false,
+        message: "Success",
+        action: "User created successfully.",
+      };
+    } catch (error: unknown) {
+      const code = error instanceof FirebaseError ? error.code : "auth/unknown";
+      const action =
+        code === "auth/email-already-in-use"
+          ? "Email address in use, please use another one."
+          : code === "auth/invalid-email"
+            ? "Invalid email, please use another one."
+            : "Could not create your account. Please try again.";
+      return { error: true, message: code, action };
     }
   };
 
   const signUpWithGoogle = async () => {
-    const googleAuthProvider = new GoogleAuthProvider();
-
-    const res = await signInWithPopup(auth, googleAuthProvider);
-
-    const user = res.user;
-
-    await setDoc(doc(db, "users", user.uid), {
-      uid: user.uid,
-      displayName: user.displayName,
-      email: user.email,
-      profilePicture: user.photoURL,
-      fullName: user.displayName,
-      username: null,
-      following: ["9apvkdI9ZhSm8Ot1NignmKlicR93"],
-      followers: [],
-    }).then((data) => {
-      console.log("User created successfully");
-    });
+    const { user: signedInUser } = await signInWithPopup(
+      auth,
+      new GoogleAuthProvider(),
+    );
+    await ensureUserProfile(signedInUser);
   };
 
   const signUpWithFacebook = async () => {
-    const facebookAuthProvider = new FacebookAuthProvider();
-
-    const res = await signInWithPopup(auth, facebookAuthProvider);
-
-    const user = res.user;
-
-    await setDoc(doc(db, "users", user.uid), {
-      uid: user.uid,
-      displayName: user.displayName,
-      email: user.email,
-      profilePicture: user.photoURL,
-      fullName: user.displayName,
-      username: null,
-      following: ["9apvkdI9ZhSm8Ot1NignmKlicR93"],
-      followers: [],
-    }).then((data) => {
-      console.log("User created successfully");
-    });
-  };
-
-  const logInWithEmailAndPassword = (email: string, password: string) => {
-    return signInWithEmailAndPassword(auth, email, password);
-  };
-
-  const sendPasswordResetLink = (email: string) => {
-    return sendPasswordResetEmail(auth, email);
-  };
-
-  const logOut = async () => {
-    setUser(null);
-    await signOut(auth);
+    const { user: signedInUser } = await signInWithPopup(
+      auth,
+      new FacebookAuthProvider(),
+    );
+    await ensureUserProfile(signedInUser);
   };
 
   return (
@@ -195,11 +108,12 @@ export const AuthContextProvider = ({
       value={{
         user,
         signUp,
-        logInWithEmailAndPassword,
-        logOut,
+        logInWithEmailAndPassword: (email, password) =>
+          signInWithEmailAndPassword(auth, email, password),
+        logOut: () => signOut(auth),
         signUpWithGoogle,
         signUpWithFacebook,
-        sendPasswordResetLink,
+        sendPasswordResetLink: (email) => sendPasswordResetEmail(auth, email),
       }}
     >
       {loading ? null : children}
@@ -207,4 +121,9 @@ export const AuthContextProvider = ({
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context)
+    throw new Error("useAuth must be used within AuthContextProvider");
+  return context;
+};

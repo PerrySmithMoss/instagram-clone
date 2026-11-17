@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import { createPortal } from "react-dom";
-import { useAuth } from "../../../context/AuthContext";
 import styles from "./ViewPost.module.css";
 
 interface IViewPostModalProps {
@@ -16,22 +15,11 @@ export const ViewPostModal: React.FC<IViewPostModalProps> = ({
   onClose,
   selector,
 }) => {
-  const ref = useRef<any>(null);
-
-  const [mounted, setMounted] = useState(false);
-
-  const [selectedFile, setSelectedFile] = useState<
-    string | ArrayBuffer | null | undefined
-  >(null);
-
-  useEffect(() => {
-    ref.current = document.querySelector(`#${selector}`);
-    setMounted(true);
-  }, [selector]);
-
   if (!open) return null;
+  const container =
+    typeof document === "undefined" ? null : document.getElementById(selector);
 
-  return mounted
+  return container
     ? createPortal(
         <div
           className={`${styles.modalBackdrop}`}
@@ -41,7 +29,7 @@ export const ViewPostModal: React.FC<IViewPostModalProps> = ({
           }}
         >
           <div
-            className={`${styles.modalContent} border rounded`}
+            className={`${styles.modalContent} border rounded-sm`}
             onClick={(e) => {
               // do not close modal if anything inside modal content is clicked
               e.stopPropagation();
@@ -57,7 +45,7 @@ export const ViewPostModal: React.FC<IViewPostModalProps> = ({
             </div>
           </div>
         </div>,
-        ref.current
+        container,
       )
     : null;
 };

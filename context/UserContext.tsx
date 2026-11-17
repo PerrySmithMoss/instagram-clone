@@ -1,7 +1,13 @@
-import { doc, getDoc } from "firebase/firestore";
-import { createContext, useContext, useEffect, useState } from "react";
+import { doc, onSnapshot } from "firebase/firestore";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { db } from "../firebase";
-import { IUserData } from "../types/userData";
+import type { IUserData } from "../types/userData";
 import { useAuth } from "./AuthContext";
 
 interface IUserDataContext {
@@ -9,51 +15,75 @@ interface IUserDataContext {
   setUserData: React.Dispatch<React.SetStateAction<IUserData>>;
 }
 
-const UserDataContext = createContext<IUserDataContext>({} as IUserDataContext);
+const emptyProfile = (uid: string): IUserData => ({
+  id: uid,
+  uid,
+  displayName: "",
+  email: "",
+  fullName: "",
+  username: "",
+  profilePicture: "",
+  followers: [],
+  following: [],
+});
+
+const UserDataContext = createContext<IUserDataContext | undefined>(undefined);
 
 export const UserDataContextProvider = ({
   children,
 }: {
   children: React.ReactNode;
-}): JSX.Element => {
+}) => {
   const { user } = useAuth();
-  const [userData, setUserData] = useState<IUserData>({} as IUserData);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  const getUserData = async () => {
-    if (user) {
-      const docRef = doc(db, `users/${user.uid}`);
-
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        setUserData(data as IUserData);
-        setLoading(false);
-      } else {
-        setLoading(false);
-        // doc.data() will be undefined in this case
-        console.log("No such document!");
-      }
-    }
-  };
+  const uid = user?.uid ?? "";
+  const [profile, setProfile] = useState<{
+    uid: string;
+    data: IUserData;
+  } | null>(null);
 
   useEffect(() => {
-    if (user) {
-      getUserData();
-    }
-  }, [user]);
+    if (!uid) return;
+    return onSnapshot(
+      doc(db, "users", uid),
+      (snapshot) => {
+        setProfile({
+          uid,
+          data: snapshot.exists()
+            ? ({ ...snapshot.data(), id: snapshot.id } as IUserData)
+            : emptyProfile(uid),
+        });
+      },
+      () => setProfile({ uid, data: emptyProfile(uid) }),
+    );
+  }, [uid]);
 
+  const setUserData = useCallback<
+    React.Dispatch<React.SetStateAction<IUserData>>
+  >(
+    (update) => {
+      setProfile((previous) => {
+        const data = previous?.uid === uid ? previous.data : emptyProfile(uid);
+        return {
+          uid,
+          data: typeof update === "function" ? update(data) : update,
+        };
+      });
+    },
+    [uid],
+  );
+
+  const userData = profile?.uid === uid ? profile.data : emptyProfile(uid);
+  const loading = Boolean(uid && profile?.uid !== uid);
   return (
-    <UserDataContext.Provider
-      value={{
-        userData,
-        setUserData,
-      }}
-    >
+    <UserDataContext.Provider value={{ userData, setUserData }}>
       {loading ? null : children}
     </UserDataContext.Provider>
   );
 };
 
-export const useUserData = () => useContext(UserDataContext);
+export const useUserData = () => {
+  const context = useContext(UserDataContext);
+  if (!context)
+    throw new Error("useUserData must be used within UserDataContextProvider");
+  return context;
+};
